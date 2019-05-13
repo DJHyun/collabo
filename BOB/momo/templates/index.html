@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="main">
+    <h1>Sticky Notes</h1>
+    <textarea v-model="content"></textarea>
+    <button @click="writeMemo">Write!</button>
+    <div id="memo-container">
+      <div class="memo" v-for="memo in memos">
+        <div @click="delete_memo(memo.id)" class="memo-delete-button" ></div>
+        {{ memo.content }}
+      </div>
+    </div>
+  </div>
+  <script>
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    
+    if(dd<10) {
+     dd='0'+dd
+    }
+    
+    if(mm<10) {
+     mm='0'+mm
+    }
+    
+    today = yyyy+mm+dd
+    const app = new Vue({
+      el: '#main',
+      data: {
+        // c9 주소
+        url: 'http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?',
+        params: {
+          'key':'db2280283c7ae6f2389c5ab040847efe',
+          'targetDt':today-1
+        },
+        content: '',
+        memos: [],
+        
+      },
+      methods: {
+        // 서버로 요청을 보내서 memo를 작성하고 응답받은 memo 데이터를 this.memos에 push
+        writeMemo: function () {
+          axios.get(`${this.url}key=${this.params.key}&targetDt=${this.params.targetDt}`)
+            .then(response => {
+              this.getMethod()
+              this.content = ''
+              console.log(response.data)
+            })
+        },
+        getMethod: function(){
+          axios.get(this.url)
+          .then(response => {
+            this.memos = response.data
+          })
+        },
+        delete_memo: function(memo_id){
+          console.log(memo_id)
+          axios.delete(this.url+memo_id+"/")
+          this.getMethod()
+        }
+      },
+      // 서버로 요청을 보내서 memeos를 불러온 뒤 this.memos에 할당
+      created: function () {
+        this.getMethod()
+      }
+    })
+  </script>
+</body>
+
+</html>
