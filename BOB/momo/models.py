@@ -8,7 +8,7 @@ class Movie(models.Model):
     poster_url = models.ImageField(blank=False) # 영화 포스터
     audiCnt = models.IntegerField() # 해당일 관객수
     audinten = models.IntegerField() # 전일 대비 증감수
-    audiChange = models.IntegerField() # 전일 대비 증감 비율
+    audiChange = models.FloatField() # 전일 대비 증감 비율
     auidAcc = models.IntegerField() # 누적 관객수
     userRating = models.IntegerField() # 영화 평점
     
