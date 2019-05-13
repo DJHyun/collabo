@@ -3,11 +3,16 @@
 
 <head>
   <title>Document</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  
 </head>
 
 <body>
+  {% for i in movies %}
+   <img :src="i.poster_url" style="width: 300px; height: 300px">{{ i.poster_url }}</img>
+  {% endfor %}
+  <img src="https://movie-phinf.pstatic.net/20190404_182/1554340290133Khnb5_JPEG/movie_image.jpg?type=m203_290_2" style="width: 300px; height: 300px">
+  
+  <p>{{ movies }}</p>
   <div id="main">
     <h1>Sticky Notes</h1>
     <textarea v-model="content"></textarea>
@@ -19,6 +24,9 @@
       </div>
     </div>
   </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
     var today = new Date();
     var dd = today.getDate();
@@ -38,10 +46,11 @@
       el: '#main',
       data: {
         // c9 주소
-        url: 'http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?',
+        url: 'https://openapi.naver.com/v1/search/movie?query?',
         params: {
           'key':'db2280283c7ae6f2389c5ab040847efe',
-          'targetDt':today-1
+          'targetDt':today-1,
+          'itemPerPage':10
         },
         content: '',
         memos: [],
@@ -50,12 +59,13 @@
       methods: {
         // 서버로 요청을 보내서 memo를 작성하고 응답받은 memo 데이터를 this.memos에 push
         writeMemo: function () {
-          axios.get(`${this.url}key=${this.params.key}&targetDt=${this.params.targetDt}`)
+          axios.get(`${this.url}key=${this.params.key}&targetDt=${this.params.targetDt}&itemPerPage=${this.params.itemPerPage}`)
             .then(response => {
               this.getMethod()
               this.content = ''
               console.log(response.data)
             })
+          axios.get(``)
         },
         getMethod: function(){
           axios.get(this.url)
