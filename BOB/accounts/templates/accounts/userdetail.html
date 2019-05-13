@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block body %}
+
+
+
+<p>user name : {{user_infos.username}}</p>
+<p>last name : {{user_infos.last_name}}</p>
+<p>first name : {{user_infos.first_name}}</p>
+<p>팔로워 : {{user_infos.followers.count}} 명</p>
+<p>팔로잉 : {{user_infos.followings.count}} 명</p>
+
+<p>평점정보</p>
+{% for score in user_infos.score_set.all %}
+
+<p>영화제목 : {{score.movie.title}} 평점: {{score.value}}점, 한줄평: {{score.content}}</p>
+
+{% endfor %}
+
+
+
+
+
+{% if user.is_authenticated %}
+  {% if user_infos != request.user %}
+    {% if request.user in user_infos.followers.all %}
+      <a class="btn btn-danger" href="{% url 'accounts:follow' user_infos.id %}">언팔로우</a>
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'accounts:follow' user_infos.id %}">팔로우</a>
+    {% endif %}
+  {% else %}
+    <h2 class="row justify-content-center">당신이 팔로잉 하는 사람들이 추천하는 영화</h2>
+    <div class="row justify-content-center">
+      <div class="card" style="width:25%;">
+        <div class="card-header row justify-content-center">{{ recommend_movie.movie.title }}</div>
+        <a href="{% url 'movies:detail' recommend_movie.movie.id %}">
+          <img src="{{ recommend_movie.movie.poster_url }}"class="card-img-top"alt="recommend movie">
+        </a>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+      
+{% endblock %}
