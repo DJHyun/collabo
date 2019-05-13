@@ -10,7 +10,7 @@ class Movie(models.Model):
     audinten = models.IntegerField() # 전일 대비 증감수
     audiChange = models.FloatField() # 전일 대비 증감 비율
     auidAcc = models.IntegerField() # 누적 관객수
-    userRating = models.IntegerField() # 영화 평점
+    userRating = models.FloatField() # 영화 평점
     
 class Match(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
