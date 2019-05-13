@@ -56,7 +56,7 @@ ROOT_URLCONF = 'bob.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'bob', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

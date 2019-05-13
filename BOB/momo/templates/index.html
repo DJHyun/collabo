@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% block body %}
 
-<head>
-  <title>Document</title>
-  
-</head>
 
-<body>
-  
+
+
+
   
 
   {% for movie in movies %}
@@ -95,6 +92,6 @@
       }
     })
   </script>
-</body>
 
-</html>
+
+{% endblock %}
