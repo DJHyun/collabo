@@ -7,12 +7,22 @@
 </head>
 
 <body>
-  {% for i in movies %}
-   <img :src="i.poster_url" style="width: 300px; height: 300px">{{ i.poster_url }}</img>
-  {% endfor %}
-  <img src="https://movie-phinf.pstatic.net/20190404_182/1554340290133Khnb5_JPEG/movie_image.jpg?type=m203_290_2" style="width: 300px; height: 300px">
   
-  <p>{{ movies }}</p>
+  
+
+  {% for movie in movies %}
+  <article class="card">
+    <img class="card-img-top"style="width: 300px; height: 400px" src={{movie.poster_url}} alt={{movie.title}}>
+    <div class="card-body">
+        <h5 class="card-title">{{movie.title}}</h5>
+        <p class="card-text">
+            <small class="text-muted">{{movie.audience}}</small>
+        </p>
+        <a href="#" class="btn btn-primary" @click="toggleDetail(movie.id)">영화 상세 보기</a>
+    </div>
+  </article>
+  {% endfor %}                  
+
   <div id="main">
     <h1>Sticky Notes</h1>
     <textarea v-model="content"></textarea>

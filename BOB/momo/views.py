@@ -4,6 +4,7 @@ import requests
 import json
 from .models import Movie
 import os
+from bs4 import BeautifulSoup
 
 # Create your views here.
 naver_secret = os.getenv('NAVERSECRET')
@@ -46,11 +47,15 @@ def getmoviedatalocal():
         
         response = requests.get(naver_url, headers=headers).text
         document = json.loads(response)['items'][0]
-        print(document)
-        
+        # print(document)
         
         userRating = document['userRating']
-        poster_url = 'https://movie.naver.com/movie/bi/mi/photoViewPopup.nhn?movieCode='+document['link'].split('=')[1]
+        img_url = 'https://movie.naver.com/movie/bi/mi/photoViewPopup.nhn?movieCode='+document['link'].split('=')[1]
+        
+        response2 = requests.get(img_url).text
+        soup = BeautifulSoup(response2,'html.parser')
+        all_divs = soup.find("img")
+        poster_url = all_divs.get('src')
         
         movie = Movie()
         movie.title = title
@@ -64,19 +69,13 @@ def getmoviedatalocal():
     
     
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
-getmoviedatalocal()
+# getmoviedatalocal()
+
 
 def movieList(request):
-    movie = Movie.objects.all()
-    print(movie)
-    return render(request, 'index.html', {'movies':movie})
+    movies = Movie.objects.all()
+    print(movies)
+    print(movies)
+    return render(request, 'index.html', {'movies':movies})
 
 
-# class Movie(models.Model):
-#     title = models.CharField(max_length=120) # 영화 제목
-#     poster_url = models.ImageField(blank=False) # 영화 포스터
-#     audiCnt = models.IntegerField() # 해당일 관객수
-#     audinten = models.IntegerField() # 전일 대비 증감수
-#     audiChange = models.IntegerField() # 전일 대비 증감 비율
-#     auidAcc = models.IntegerField() # 누적 관객수
-#     userRating = models.IntegerField() # 영화 평점
