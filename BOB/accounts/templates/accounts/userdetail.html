@@ -40,7 +40,12 @@
     {% elif match.win == 2 %}
     <td>패</td>
     {% else %}
-    <td>내일발표</td>
+    <td>
+      <form action = "{% url 'accounts:refund' match.id %}" method = "POST"> 
+      {% csrf_token %}
+      <button type="submit" class="btn btn-info">환불하기</button>
+      </form>
+    </td>
     {% endif %}
   </tr>
   {% endfor %}
