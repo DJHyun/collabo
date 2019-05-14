@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_POST
 from django.contrib.auth import get_user_model
 from .forms import UserCustomCreationForm
+from momo.models import Movie, Match
 
 # Create your views here.
 
@@ -15,6 +16,7 @@ from .forms import UserCustomCreationForm
 def signup(request):
     if request.user.is_authenticated:
         return redirect('movies:list')
+        
     if request.method == 'POST':
         user_form = UserCustomCreationForm(request.POST)
         if user_form.is_valid():
@@ -23,6 +25,7 @@ def signup(request):
             return redirect('movies:list')
     else:
         user_form = UserCustomCreationForm()
+        
     context = {'form': user_form}
     return render(request, 'accounts/forms.html', context)
 
@@ -50,23 +53,37 @@ def user_info(request):
         'users':users,
     }
     return render(request,'accounts/userlist.html',context)
-    
+
+@login_required
 def user_detail(request,user_id):
     user_infos = get_user_model().objects.get(id=user_id)
-    if request.user.is_authenticated:
-        recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
-    else:
-        recommend_movie = Score.objects.order_by('-value').first()
+    # if request.user.is_authenticated:
+    #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    # else:
+    #     recommend_movie = Score.objects.order_by('-value').first()
     context={
         'user_infos':user_infos,
-        'recommend_movie':recommend_movie,
+        # 'recommend_movie':recommend_movie,
     }
     return render(request,'accounts/userdetail.html',context)
 
+@login_required
+def up_money(request,match_id):
+    match = get_object_or_404(Match,pk=match_id)
+    if request.user in match.user_up.all():
+        match.user_up.remove(request.user)
+    else:
+        match.user_up.add(request.user)
+    
+    return redirect("movies:list")
+    
 
-def up_money(request,user_id,movie_id):
-    pass
-
-
-def down_money(request,user_id,movie_id):
-    pass
+@login_required
+def down_money(request,match_id):
+    match = get_object_or_404(Match,pk=match_id)
+    if request.user in match.user_down.all():
+        match.user_down.remove(request.user)
+    else:
+        match.user_down.add(request.user)
+    
+    return redirect("moveis:list")

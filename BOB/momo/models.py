@@ -11,7 +11,11 @@ class Movie(models.Model):
     audiChange = models.FloatField() # 전일 대비 증감 비율
     auidAcc = models.IntegerField() # 누적 관객수
     userRating = models.FloatField() # 영화 평점
+    date = models.DateField()
     
+    def __str__(self):
+        return self.title
+        
 class Match(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     # up = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="up", blank=True,null=True)
@@ -20,3 +24,6 @@ class Match(models.Model):
     user_down = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="down",blank=True)
     standard = models.PositiveIntegerField(default = 0)
     date = models.DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.movie} + {self.date}'

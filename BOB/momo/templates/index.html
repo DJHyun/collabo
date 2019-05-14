@@ -7,41 +7,35 @@
 
   
 
-  {% for movie in movies %}
-    <div class="row">
-    <div class="col-sm">
-      One of three columns
-    </div>
-    <div class="col-sm">
-      One of three columns
-    </div>
-    <div class="col-sm">
-      One of three columns
-    </div>
-  </div>
-  
+  {% for match in matches %}
   <div class="card">
+    
     <div class="row">
       <div class="col-3 d-flex justify-content-center align-self-center">
-        <a href="#"><i class="fas fa-thumbs-up" style="font-size:5rem;color:red;" ></i></a>
+        <a href="{% url 'accounts:up_money' match.id %}">
+          <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:red;" ></i>
+          <p style="font-size:5rem;color:red;">X 1.7</p>
+        </a>
       </div>
       
       <div class="col-6">
         <div class="card-body text-center">
-        <img class="card-img-top" src={{movie.poster_url}} alt={{movie.title}}>  
-          <h5 class="card-title">{{movie.title}}</h5>
+        <img class="card-img-top" src={{match.movie.poster_url}} alt={{match.movie.title}}>  
+          <h5 class="card-title">{{match.movie.title}}</h5>
           <p class="card-text">
-              <small class="text-muted">{{movie.audience}}</small>
+              <small class="text-muted">{{match.movie.audience}}</small>
           </p>
-          <a href="#" class="btn btn-primary" @click="toggleDetail(movie.id)">영화 상세 보기</a>
+          <a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">영화 상세 보기</a>
         </div>  
       </div>
-    
+      
       <div class="col-3 d-flex justify-content-center align-self-center">
-        <a href="#"><i class="fas fa-thumbs-down" style="font-size:5rem;color:blue"></i></a>
-      </div>  
+        <a href="{% url 'accounts:down_money' match.id %}">
+          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:blue"></i>
+          <p style="font-size:5rem;color:blue">X 1.7</p>
+        </a>
+      </div>
     </div>
-    
     
   </div>
   {% endfor %}                  

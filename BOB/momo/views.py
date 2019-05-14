@@ -2,7 +2,7 @@ from django.shortcuts import render
 import datetime
 import requests
 import json
-from .models import Movie
+from .models import Movie,Match
 import os
 from bs4 import BeautifulSoup
 
@@ -17,9 +17,10 @@ def test(request):
     
 def getmoviedatalocal():
 
-    today = datetime.datetime.today()
+    today1 = datetime.datetime.today()
+    # print(today1.strftime("%Y-%m-%d"))
     # print(int(today.strftime("%Y%m%d"))-1)
-    today = int(today.strftime("%Y%m%d"))-1
+    today = int(today1.strftime("%Y%m%d"))-1
     # print("오늘입니다")
     url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
     params={
@@ -34,6 +35,7 @@ def getmoviedatalocal():
     }
     res = requests.get(url,params=params).text
     doc = json.loads(res)
+    
     # print(doc['boxOfficeResult']['dailyBoxOfficeList'][0])
     # length = len(doc['boxOfficeResult']['dailyBoxOfficeList'])
     for a in range(10):
@@ -65,17 +67,32 @@ def getmoviedatalocal():
         movie.audiChange = audiChange
         movie.auidAcc = auidAcc
         movie.userRating = userRating
+        movie.date = today1.strftime("%Y-%m-%d")
         movie.save()
+        
+        match = Match(movie=movie,standard=movie.audiCnt)
+        match.save()
     
-    
-# 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
-# getmoviedatalocal()
-
 
 def movieList(request):
-    movies = Movie.objects.all()
-    print(movies)
-    print(movies)
-    return render(request, 'index.html', {'movies':movies})
+    today1 = datetime.datetime.today()
+    # today = int(today.strftime("%Y%m%d"))-1#어제꺼를 기준으로 해야하므로
+    print(today1.strftime("%Y-%m-%d"))
+    # print(today1.strftime("%Y-%m-(%d-1)"))
+    # movies = Movie.objects.filter(date=today1.strftime("%Y-%m-%d"))
+    # movies = Movie.objects.all()
+    
+    matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
+    
+    return render(request, 'index.html', {'matches':matches})
 
+def moviedetail(request,movie_id):
+    movie = Movie.objects.get(pk=movie_id)
+    
+    return render(request,'detail.html',{'movie':movie})
 
+# now = datetime.datetime.today()
+# if 
+
+# 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
+# getmoviedatalocal()
