@@ -12,10 +12,16 @@
     
     <div class="row">
       <div class="col-3 d-flex justify-content-center align-self-center">
-        <a href="{% url 'accounts:up_money' match.id %}">
+        <!--<a href="{% url 'accounts:up_money' match.id %}">-->
+          {% if request.user in match.user_up.all %}
           <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:red;" ></i>
-          <p style="font-size:5rem;color:red;">X 1.7</p>
-        </a>
+          <p style="font-size:5rem;color:red">X {{match.uprate}}</p>
+          {% else %}
+          <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:black;" ></i>
+          <p style="font-size:5rem;color:black">X {{match.uprate}}</p>
+          {% endif %}
+          
+        <!--</a>-->
       </div>
       
       <div class="col-6">
@@ -30,10 +36,16 @@
       </div>
       
       <div class="col-3 d-flex justify-content-center align-self-center">
-        <a href="{% url 'accounts:down_money' match.id %}">
-          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:blue"></i>
-          <p style="font-size:5rem;color:blue">X 1.7</p>
-        </a>
+        <!--<a href="{% url 'accounts:down_money' match.id %}">-->
+          {% if request.user in match.user_down.all %}
+          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:red"></i>
+          <p style="font-size:5rem;color:red">X {{match.downrate}}</p>
+          {% else %}
+          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:black"></i>
+          <p style="font-size:5rem;color:black">X {{match.downrate}}</p>
+          {% endif %}
+          
+        <!--</a>-->
       </div>
     </div>
     

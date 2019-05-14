@@ -2,9 +2,10 @@ from django.shortcuts import render
 import datetime
 import requests
 import json
-from .models import Movie,Match
+from .models import Movie,Match,UserMatchMoney
 import os
 from bs4 import BeautifulSoup
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 naver_secret = os.getenv('NAVERSECRET')
@@ -91,6 +92,16 @@ def moviedetail(request,movie_id):
     
     return render(request,'detail.html',{'movie':movie})
 
+#모모 구매
+@login_required
+def predict(request):
+    if request.method=="POST":
+        return render(request,'predict.html',{'matches':matches})
+        
+    else:
+        today1 = datetime.datetime.today()
+        matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
+        return render(request,'predict.html',{'matches':matches})
 # now = datetime.datetime.today()
 # if 
 
