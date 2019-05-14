@@ -62,3 +62,11 @@ def user_detail(request,user_id):
         'recommend_movie':recommend_movie,
     }
     return render(request,'accounts/userdetail.html',context)
+
+
+def up_money(request,user_id,movie_id):
+    pass
+
+
+def down_money(request,user_id,movie_id):
+    pass
