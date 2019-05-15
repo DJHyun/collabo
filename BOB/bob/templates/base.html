@@ -9,24 +9,109 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <style>
+      footer {
+        background-color: #31708F;
+        color: white;
+        flex-shrink: 0;
+    }
     
-    <title>Momo</title>
+    footer > div.footer-copyright {
+        background-color: #36495D;
+        color: white;
+    }
+
+    </style>
+    <title>MoMo</title>
 </head>
 <body>
-    {% include 'nav.html' %}
-    
+<!--NavBar-->
+{% include 'nav.html' %}
+<div id="app" class="container">
+    <!--Sidebar & Content-->
+    <div class="row mt-5">
+
+        <!--Sidebar-->
+        <aside class="col-md-2 d-none d-md-block sidebar">
+            <nav class="sidebar-sticky mt-2">
+                <ul class="nav flex-column">
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block">영화 MoMo 구매</button>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block">오늘 MoMo 정보</button>
+                    </li>
+                    
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block">지난 MoMo 정보</button>
+                    </li>
+                    
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block">영화 추천</button>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                    {% if user.username == 'admin2' %}
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block" onclick = "location.href = '{% url 'accounts:money' 1 0 %}' ">MoMo 환전 확인</button>
+                    </li>
+                    {% else %}
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block" onclick = "location.href = '{% url 'accounts:money' 2 user.id  %}' ">MoMo 충전</button>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <button class="btn btn-outline-info btn-block" onclick = "location.href = '{% url 'accounts:money' 3 user.id %}' ">MoMo 환전 신청</button>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+        </aside>
+
+        <!--Content-->
+        <div class="col-md-10 d-none d-md-block">
+        {% block body %}
+        {% endblock %}
+        </div>
+    </div>
+
+
+<!-- Footer -->
+<footer class="page-footer font-small pt-4">
+    <div class="container-fluid text-center text-md-left">
+        <div class="row">
+            <div class="col-md-6 mt-md-0 mt-3">
+                <h5 class="text-uppercase">MOMO</h5>
+                <p>먹튀 없는 영화 MoMo 사이트</p>
+            </div>
+            <hr class="clearfix w-100 d-md-none pb-3">
+            <div class="col-md-3 offset-md-3 mb-md-0 mb-3">
+                <h5 class="text-uppercase">Links</h5>
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="#!">Link 1</a>
+                    </li>
+                    <li>
+                        <a href="#!">Link 2</a>
+                    </li>
+                    <li>
+                        <a href="#!">Link 3</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright text-center py-3">
+        전화 문의 : 010-2955-1509 대표 김동환
+    </div>
+</footer>
+</div>
     <!--{% if user.is_authenticated %}-->
     <!--    <p>{{ user.username }}</p>-->
     <!--    <a href="{% url 'accounts:logout' %}">로그아웃</a>-->
     <!--{% else %}-->
     <!--    <a href="{% url 'accounts:login' %}">로그인</a>-->
     <!--{% endif %}-->
-    
-
-    <div class="container">
-    {% block body %}
-    {% endblock %}
-    </div>
     
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

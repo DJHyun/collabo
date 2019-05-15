@@ -5,11 +5,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_POST
 from django.contrib.auth import get_user_model
-from .forms import UserCustomCreationForm
+from .forms import UserCustomCreationForm,MoneyCreationForm
 from momo.models import Movie, Match
+from .models import Money
 
 # Create your views here.
-
 
 
 @require_http_methods(["GET", "POST"])
@@ -26,7 +26,7 @@ def signup(request):
     else:
         user_form = UserCustomCreationForm()
         
-    context = {'form': user_form}
+    context = {'form': user_form, 'flag':'one'}
     return render(request, 'accounts/forms.html', context)
 
 def login(request):
@@ -39,7 +39,7 @@ def login(request):
             return redirect('movies:list')
     else:
         login_form = AuthenticationForm()
-    context = {'form': login_form}
+    context = {'form': login_form, 'flag':'two'}
     return render(request, 'accounts/forms.html', context)
 
 @login_required
@@ -56,17 +56,20 @@ def user_info(request):
 
 @login_required
 def user_detail(request,user_id):
-    user_infos = get_user_model().objects.get(id=user_id)
-    # if request.user.is_authenticated:
-    #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
-    # else:
-    #     recommend_movie = Score.objects.order_by('-value').first()
+    user = get_user_model().objects.get(id=user_id)
+    message = False
+    if request.method == 'POST':
+        form = UserCustomCreationForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            message = "수정되었습니다."
+    form = UserCustomCreationForm(instance=user)
     context={
-        'user_infos':user_infos,
-        # 'recommend_movie':recommend_movie,
+        'form':form,
+        'message':message
     }
-    return render(request,'accounts/userdetail.html',context)
-
+    return render(request, 'accounts/forms.html', context)
+    
 @login_required
 def up_money(request,match_id):
     match = get_object_or_404(Match,pk=match_id)
@@ -86,4 +89,28 @@ def down_money(request,match_id):
     else:
         match.user_down.add(request.user)
     
-    return redirect("moveis:list")
+    return redirect("movies:list")
+    
+def money(request, flag, user_id):
+    if request.method == 'POST':
+        if flag == 1:
+            pass
+        elif flag == 2:
+            user = get_object_or_404(get_user_model(), pk=user_id)
+            user.points += int(request.POST['money'])
+            user.save()
+            return redirect("movies:list")
+        else:
+            user = get_object_or_404(get_user_model(), pk=user_id)
+            Money.objects.create(user=user, money=int(request.POST['money']))
+            return redirect("movies:list")
+    else:
+        if flag == 1:
+            form = Money.objects.all()
+        else:
+            form = MoneyCreationForm()
+    context = {
+        'form':form,
+        'flag':flag
+    }
+    return render(request, 'accounts/money_form.html', context)

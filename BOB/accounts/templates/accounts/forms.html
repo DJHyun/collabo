@@ -1,8 +1,41 @@
 {% extends 'base.html' %}
+
+{% load bootstrap4 %}
+
 {% block body %}
+
+{% if message %}
+<script>
+  alert('{{ message }}');
+</script>
+{% endif %}
+
+{% if flag == 'one' %}
+<h1 >Welcome To MoMo TT</h1>
+{% else %}
+  {% if flag == 'two' %}
+  <h1>MoMo 로그인 TT</h1>
+  {% else %}
+  <h1>MoMo 수정 TT</h1>
+  {% endif %}
+{% endif %}
 <form method="POST">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="보내기">
+    {% bootstrap_form form %}
+    
+    {% if flag == 'one' %}
+    {% buttons %}
+    <button type="submit" class="btn btn-info">회원가입</button>
+    {% endbuttons %}
+    {% else %}
+    {% if flag == 'two' %}
+    {% buttons %}
+    <button type="submit" class="btn btn-info">로그인</button>
+    {% endbuttons %}
+    {% else %}
+    <button type="submit" class="btn btn-info">정보수정</button>
+    {% endif %}
+    {% endif %}
 </form>
+
 {% endblock %}

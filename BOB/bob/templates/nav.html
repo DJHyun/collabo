@@ -22,18 +22,16 @@
         <!--<a class="nav-link" href="">내글보기</a>-->
       </li>
       <li class="nav-item">
-        <!--<a class="nav-link" href="">새글쓰기</a>-->
+        <a class="nav-link" tabindex="-1" aria-disabled="true">{{ user }}님 포인트 {{ user.points }} MoMo</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">{{ user }}</a>
+        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link" href="{% url 'accounts:logout' %}">로그아웃</a>
       </li>
       {% else %}
-      
-      
       <li class="nav-item">
         <a class="nav-link" href="{% url 'accounts:signup' %}">회원가입</a>
       </li>
@@ -41,7 +39,6 @@
         <a class="nav-link" href="{% url 'accounts:login' %}">로그인</a>
       </li>
       {% endif %}
-      
     </ul>
   </div>
 </nav>

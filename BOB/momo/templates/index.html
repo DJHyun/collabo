@@ -1,15 +1,10 @@
 {% extends 'base.html' %}
+
 {% block body %}
-
-
-
-
-
   
-
   {% for match in matches %}
-  <div class="card">
     
+  <div class="card">
     <div class="row">
       <div class="col-3 d-flex justify-content-center align-self-center">
         <a href="{% url 'accounts:up_money' match.id %}">
@@ -37,20 +32,9 @@
       </div>
     </div>
     
-  </div>
   {% endfor %}                  
-
-  <div id="main">
-    <h1>Sticky Notes</h1>
-    <textarea v-model="content"></textarea>
-    <button @click="writeMemo">Write!</button>
-    <div id="memo-container">
-      <div class="memo" v-for="memo in memos">
-        <div @click="delete_memo(memo.id)" class="memo-delete-button" ></div>
-        {{ memo.content }}
-      </div>
-    </div>
   </div>
+
   
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

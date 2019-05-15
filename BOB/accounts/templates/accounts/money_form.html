@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+
+{% block body %}
+
+{% if flag == 1 %}
+<h1 >MoMo 환전 확인</h1>
+{% else %}
+{% if flag == 2 %}
+<h1>MoMo 충전</h1>
+{% else %}
+<h1>MoMo 환전 신청</h1>
+{% endif %}
+{% endif %}
+
+{% if flag == 1 %}
+{% for money in form %}
+<p>{{ money }}<button class="btn btn-info">승인</button> <button class="btn btn-info">거절</button></p>
+{% endfor %}
+
+<form method="POST">
+    {% csrf_token %}
+    {% else %}
+    {% bootstrap_form form %}
+    {% if flag == 2 %}
+    {% buttons %}
+    <button type="submit" class="btn btn-info">충전</button>
+    {% endbuttons %}
+    {% else %}
+    <button type="submit" class="btn btn-info">환전 신청</button>
+    {% endif %}
+    {% endif %}
+</form>
+{% endblock %}
