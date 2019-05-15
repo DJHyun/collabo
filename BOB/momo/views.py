@@ -86,20 +86,14 @@ def moviedetail(request,movie_id):
     
     return render(request,'detail.html',{'movie':movie})
 
-
 #모모 구매
 @login_required
 def predict(request):
-    if request.method=="POST":
-        return render(request,'predict.html',{'matches':matches})
-
-    else:
-        today1 = datetime.datetime.today()
-        matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
-        return render(request,'predict.html',{'matches':matches})
+    today1 = datetime.datetime.today()
+    matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
+    return render(request,'predict.html',{'matches':matches})
         
-# now = datetime.datetime.today()
-# if 
-
+        
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
 # getmoviedatalocal()
+# print('다운 끝')
