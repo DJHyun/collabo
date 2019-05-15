@@ -18,4 +18,5 @@ urlpatterns = [
     path('check/<int:check_num>/<int:money_id>/', views.check_b, name="check"),
     path('payment/<int:user_id>/', views.payment, name='payment'),
     path('exchange/<int:user_id>/', views.exchange, name='exchange'),
+    path('calculate/',views.calculate,name="calculate"),
 ]

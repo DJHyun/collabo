@@ -10,10 +10,10 @@
         <!--<a href="{% url 'accounts:up_money' match.id %}">-->
           {% if request.user in match.user_up.all %}
           <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:red;" ></i>
-          <p style="font-size:5rem;color:red">X {{match.uprate}}</p>
+          <br><p style="font-size:5rem;color:red">X {{match.uprate}}</p>
           {% else %}
           <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:black;" ></i>
-          <p style="font-size:5rem;color:black">X {{match.uprate}}</p>
+          <br><p style="font-size:5rem;color:black">X {{match.uprate}}</p>
           {% endif %}
           
         <!--</a>-->
@@ -26,7 +26,7 @@
           <p class="card-text">
               <small class="text-muted">{{match.movie.audience}}</small>
           </p>
-          <a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">영화 상세 보기</a>
+          <a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">MoMo 상세 보기</a>
         </div>  
       </div>
       
@@ -34,10 +34,10 @@
         <!--<a href="{% url 'accounts:down_money' match.id %}">-->
           {% if request.user in match.user_down.all %}
           <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:red"></i>
-          <p style="font-size:5rem;color:red">X {{match.downrate}}</p>
+          <br><p style="font-size:5rem;color:red">X {{match.downrate}}</p>
           {% else %}
           <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:black"></i>
-          <p style="font-size:5rem;color:black">X {{match.downrate}}</p>
+          <br><p style="font-size:5rem;color:black">X {{match.downrate}}</p>
           {% endif %}
           
         <!--</a>-->
@@ -46,8 +46,6 @@
     </div>
   {% endfor %}                  
 
-
-  
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>

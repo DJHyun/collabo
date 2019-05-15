@@ -33,5 +33,8 @@ class UserMatchMoney(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     updown = models.IntegerField(default=0)
-    points = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)# 1은 up 2는 down
     win = models.IntegerField(default=0)#0은 아직 상태 모름 1은 이김 2는 짐
+    
+    def __str__(self):
+        return f"{self.user}가 {self.match}에 {self.points}를 걸었다"

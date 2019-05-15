@@ -219,7 +219,6 @@ def refund(request,match_id):
 def check_b(request,check_num,money_id):
     money = Money.objects.get(pk=money_id)
     user = get_object_or_404(get_user_model(), pk=money.user.id)
-    
     if check_num == 1:
         money.status = '승인'
         money.save()
@@ -251,3 +250,52 @@ def exchange(request,user_id):
         'money':money
     }
     return render(request, 'accounts/exchange.html', context)
+    
+@login_required    
+def calculate(request):#정산하기...관리자만 사용가능
+    if request.user.is_superuser:#관리자만..
+        today1 = datetime.datetime.today()
+        today2 = today1.strftime("%Y-%m-")
+        yesterday = today2+str(today1.day-1)
+        today = today1.strftime("%Y-%m-%d")
+        
+        yesterday_matches = Match.objects.filter(date=yesterday)#어제 열린 영화들
+        today_matches = Match.objects.filter(date=today)#오늘 열린 영화들
+        for match in yesterday_matches:
+            matches = match.usermatchmoney_set.all()
+            standard_points = 0
+            yesterday_standard = Match.objects.filter(movie=match.movie,date=yesterday)[0].movie.audiCnt
+            for a in range(10):
+                if str(today_matches[a].movie) == str(match.movie):
+                    standard_points = today_matches[a].movie.audiCnt
+                    break
+            if standard_points!=0:
+                if standard_points>yesterday_standard:#up이 맞춤
+                    money_rate = float(match.uprate)#up배당비율
+                    for smallmatch in matches:
+                        if smallmatch.updown==1 and smallmatch.win==0:#up인 사람들만 
+                            smallmatch.user.points += int(smallmatch.points*money_rate)
+                            smallmatch.win = 1#승리
+                            smallmatch.save()
+                            smallmatch.user.save()
+                        elif smallmatch.updown==2 and smallmatch.win==0:
+                            smallmatch.win = 2#패배
+                            smallmatch.save()
+                else:#down이 맞춤
+                    money_rate = float(match.downrate)#down배당비율
+                    for smallmatch in matches:
+                        if smallmatch.updown==2 and smallmatch.win==0:#down인 사람들만 
+                            smallmatch.user.points += int(smallmatch.points*money_rate)
+                            smallmatch.win = 1#승리
+                            smallmatch.save()
+                            smallmatch.user.save()
+                        elif smallmatch.updown==1 and smallmatch.win==0:
+                            smallmatch.win = 2#패배
+                            smallmatch.save()
+    return redirect('movies:list')
+
+
+
+
+                
+    
