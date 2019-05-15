@@ -12,7 +12,6 @@ import datetime
 
 # Create your views here.
 
-
 @require_http_methods(["GET", "POST"])
 def signup(request):
     if request.user.is_authenticated:
@@ -294,9 +293,3 @@ def calculate(request):#정산하기...관리자만 사용가능
                             smallmatch.save()
     ##정산한결과 보여주기로 바꾸자
     return redirect('movies:list')
-
-
-
-
-                
-    
