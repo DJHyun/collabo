@@ -5,8 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_POST
 from django.contrib.auth import get_user_model
-from .forms import UserCustomCreationForm,MoneyCreationForm
-from .models import Money
+from .forms import UserCustomCreationForm,MoneyCreationForm,ProfileForm
+from .models import Money,Profile
 from momo.models import Movie, Match, UserMatchMoney
 import datetime
 
@@ -21,6 +21,7 @@ def signup(request):
         user_form = UserCustomCreationForm(request.POST)
         if user_form.is_valid():
             user = user_form.save()
+            Profile.objects.create(user=user)
             auth_login(request, user)
             return redirect('movies:list')
     else:
@@ -57,14 +58,14 @@ def user_info(request):
 
 @login_required
 def user_update(request, user_id):
-    user = get_user_model().objects.get(id=user_id)
+    user = Profile.objects.get(id=user_id)
     message = False
     if request.method == 'POST':
-        form = UserCustomCreationForm(request.POST, instance=user)
+        form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             message = "수정되었습니다."
-    form = UserCustomCreationForm(instance=user)
+    form = ProfileForm(instance=user)
     context={
         'form':form,
         'message':message
@@ -213,7 +214,18 @@ def refund(request,match_id):
         usermatchmoney.delete()
         
         
-    return redirect('movies:list')
+    user_infos = get_user_model().objects.get(pk=request.user.id)
+    matches = UserMatchMoney.objects.filter(user=request.user.id)
+    # if request.user.is_authenticated:
+    #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    # else:
+    #     recommend_movie = Score.objects.order_by('-value').first()
+    context={
+        'user_infos':user_infos,
+        # 'recommend_movie':recommend_movie,
+        'matches':matches
+    }
+    return render(request,'accounts/userdetail.html',context)
 
 def check_b(request,check_num,money_id):
     money = Money.objects.get(pk=money_id)
