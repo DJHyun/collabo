@@ -8,17 +8,21 @@
   <a class="navbar-brand" href="/accounts/">
     accounts
   </a>
-  <a class="navbar-brand" href="/admin/">
-      admin
-  </a>
-  <a class="navbar-brand" href="{% url 'movies:predict' %}">
-      예측하기
-  </a>
+
+  
   
   {% if user.is_authenticated %}
   {% if user.is_superuser %}
-  <a class="navbar-brand" href="{% url 'movies:predict' %}">
+  <a class="navbar-brand" href="/admin/">
+      관리자 전용페이지
+  </a>
+  
+  <a class="navbar-brand" href="{% url 'accounts:calculate' %}">
       결과정산하기
+  </a>
+  
+  <a class="navbar-brand" href="{% url 'movies:getdata' %}">
+      영화정보 업데이트
   </a>
   {% endif %}
   {% endif %}
@@ -37,6 +41,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'accounts:user_update' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">{{user.username}}</a>
       </li>
       
       <li class="nav-item">

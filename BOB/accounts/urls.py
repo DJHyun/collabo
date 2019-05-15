@@ -15,4 +15,5 @@ urlpatterns = [
     # path('purchase/<int:match_id>/<int:point>/<int:updown_code>/',views.purchase,name="purchase"),
     path('purchase/<int:match_id>/',views.purchase,name="purchase"),
     path('refund/<int:match_id>/',views.refund,name="refund"),
+    path('calculate/',views.calculate,name="calculate"),
 ]

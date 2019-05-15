@@ -7,4 +7,6 @@ urlpatterns = [
     path('', views.test),
     path('list/',views.movieList,name="list"),
     path('predict/',views.predict,name="predict"),
+    path('getdata/',views.getmoviedatalocal,name="getdata"),
+    
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import datetime
 import requests
 import json
@@ -16,27 +16,24 @@ def test(request):
     return render(request, 'index.html')
     
     
-def getmoviedatalocal():
-
+def getmoviedatalocal(request):#데이터수집 영진위에서는 관객정보를 , 네이버에서는 이미지를 긁어옴
     today1 = datetime.datetime.today()
     # print(today1.strftime("%Y-%m-%d"))
     # print(int(today.strftime("%Y%m%d"))-1)
     today = int(today1.strftime("%Y%m%d"))-1
-    # print("오늘입니다")
     url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
     params={
       'key':'db2280283c7ae6f2389c5ab040847efe',
       'targetDt':today,
     #   'itemPerPage':'10',
     }
-    
+    #네이버는 환경변수로 저장함
     headers = {
         'X-Naver-Client-Id': naver_id,
         'X-Naver-Client-Secret': naver_secret
     }
     res = requests.get(url,params=params).text
     doc = json.loads(res)
-    
     # print(doc['boxOfficeResult']['dailyBoxOfficeList'][0])
     # length = len(doc['boxOfficeResult']['dailyBoxOfficeList'])
     for a in range(10):
@@ -45,13 +42,9 @@ def getmoviedatalocal():
         audinten = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiInten']
         audiChange = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiChange']
         auidAcc = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiAcc']
-        
         naver_url = "https://openapi.naver.com/v1/search/movie?query="+title
-        
         response = requests.get(naver_url, headers=headers).text
         document = json.loads(response)['items'][0]
-        # print(document)
-        
         userRating = document['userRating']
         img_url = 'https://movie.naver.com/movie/bi/mi/photoViewPopup.nhn?movieCode='+document['link'].split('=')[1]
         
@@ -73,7 +66,7 @@ def getmoviedatalocal():
         
         match = Match(movie=movie,standard=movie.audiCnt)
         match.save()
-    
+    return redirect("movies:list")
 
 def movieList(request):
     today1 = datetime.datetime.today()
