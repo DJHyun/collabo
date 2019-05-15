@@ -292,6 +292,7 @@ def calculate(request):#정산하기...관리자만 사용가능
                         elif smallmatch.updown==1 and smallmatch.win==0:
                             smallmatch.win = 2#패배
                             smallmatch.save()
+    ##정산한결과 보여주기로 바꾸자
     return redirect('movies:list')
 
 
