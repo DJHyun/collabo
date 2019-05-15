@@ -8,28 +8,127 @@
 <h1 >MoMo 환전 확인</h1>
 {% else %}
 {% if flag == 2 %}
-<h1>MoMo 충전</h1>
+<h1>{{ user }}님 MoMo 충전</h1>
 {% else %}
-<h1>MoMo 환전 신청</h1>
+<h1>{{ user }}님 MoMo 환전 신청</h1>
 {% endif %}
 {% endif %}
 
 {% if flag == 1 %}
-{% for money in form %}
-<p>{{ money }}<button class="btn btn-info">승인</button> <button class="btn btn-info">거절</button></p>
-{% endfor %}
+<style>
+    table {
+        counter-reset: rowNumber-1;
+    }
+    
+    table tr {
+        counter-increment: rowNumber;
+    }
+    
+    table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+    }
+</style>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">유저 아이디</th>
+      <th scope="col">환전 금액</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in form %}
+    <tr>
+      <td scope="row"></td>
+      <td>{{ i.user }}</td>
+      <td>{{ i.money }}</td>
+      <td><a href="{% url 'accounts:check' 1 i.id %}"><button class="btn btn-info">승인</button></a></td>
+      <td><a href="{% url 'accounts:check' 0 i.id %}"><button class="btn btn-info">거절</button></a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-<form method="POST">
+{% else %}
+<form method="POST" id="charge">
     {% csrf_token %}
-    {% else %}
-    {% bootstrap_form form %}
+    <!--{% bootstrap_form form %}-->
+    
     {% if flag == 2 %}
-    {% buttons %}
-    <button type="submit" class="btn btn-info">충전</button>
-    {% endbuttons %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="text-center">유저 이름</th>
+          <th scope="col" class="text-center">충전 방법</th>
+          <th scope="col" class="text-center">충전 금액</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center"><input class="text-center" style="border: 0px;" type="text" name="user_id" value="{{user}}" readonly/></td>
+          <td class="text-center"><select name="charge_method">
+              <option value="volvo">카드</option>
+              <option value="saab">계좌이체</option>
+              <option value="opel">무통장입금</option>
+              <option value="audi">휴대폰결제</option>
+            </select></td>
+          <td class="text-center"><input class="text-center" type="number" name="money" min="0"/></td>
+          <td><button type="submit" class="btn btn-info">충전</button></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    
     {% else %}
-    <button type="submit" class="btn btn-info">환전 신청</button>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="text-center">유저 이름</th>
+          <th scope="col" class="text-center">계좌 은행</th>
+          <th scope="col" class="text-center">환전 계좌 입력</th>
+          <th scope="col" class="text-center">환전 금액</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center"><input class="text-center" style="border: 0px;" type="text" name="user_id" value="{{user}}" readonly/></td>
+          <td class="text-center"><select name="charge_method">
+              <option value="volvo">신한은행</option>
+              <option value="saab">농협은행</option>
+              <option value="opel">국민은행</option>
+              <option value="audi">하나은행</option>
+            </select></td>
+          <td class="text-center"><input class="text-center" type="text"/></td>
+          <td class="text-center"><input class="text-center" type="number" name="money" min="0"/></td>
+          <td><button type="submit" class="btn btn-info">환전 신청</button></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    {% if message %}
+    <p class="text-right text-danger">{{message}}</p>
+    {% endif %}
+    
+    
     {% endif %}
     {% endif %}
 </form>
+
+{% if flag == 2 %}
+<div style="float:right">
+  <a href="{% url 'accounts:payment' user.id%}"><button class="btn btn-info right">지난 충전 내역 확인</button></a>
+</div>
+{% else %}
+{% if flag != 1%}
+<div style="float:right">
+  <a href="{% url 'accounts:exchange' user.id%}"><button class="btn btn-info">지난 환전 내역 확인</button></a>
+</div>
+{% endif %}
+{% endif %}
 {% endblock %}

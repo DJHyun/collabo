@@ -15,4 +15,7 @@ urlpatterns = [
     # path('purchase/<int:match_id>/<int:point>/<int:updown_code>/',views.purchase,name="purchase"),
     path('purchase/<int:match_id>/',views.purchase,name="purchase"),
     path('refund/<int:match_id>/',views.refund,name="refund"),
+    path('check/<int:check_num>/<int:money_id>/', views.check_b, name="check"),
+    path('payment/<int:user_id>/', views.payment, name='payment'),
+    path('exchange/<int:user_id>/', views.exchange, name='exchange'),
 ]

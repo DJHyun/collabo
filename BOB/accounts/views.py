@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from .forms import UserCustomCreationForm,MoneyCreationForm
 from .models import Money
 from momo.models import Movie, Match, UserMatchMoney
+import datetime
 
 # Create your views here.
 
@@ -120,26 +121,41 @@ def down_money(request,match_id):
     return redirect("movies:list")
     
 def money(request, flag, user_id):
+    message = 0
     if request.method == 'POST':
-        if flag == 1:
-            pass
-        elif flag == 2:
+        if flag == 2:
             user = get_object_or_404(get_user_model(), pk=user_id)
             user.points += int(request.POST['money'])
             user.save()
-            return redirect("movies:list")
+            Money.objects.create(user=user, money=int(request.POST['money']), status='충전',date=datetime.datetime.today())
+            money = Money.objects.filter(user=user)
+            context={
+                'money':money
+            }
+            return render(request, 'accounts/payment.html', context)
         else:
             user = get_object_or_404(get_user_model(), pk=user_id)
-            Money.objects.create(user=user, money=int(request.POST['money']))
-            return redirect("movies:list")
+            if user.points >= int(request.POST['money']):
+                Money.objects.create(user=user, money=int(request.POST['money']), status='승인 대기중', date=datetime.datetime.today())
+                user.points -= int(request.POST['money'])
+                user.save()
+                money = Money.objects.filter(user=user).exclude(status='충전')
+                context={
+                    'money':money
+                }
+                return render(request, 'accounts/exchange.html', context)
+            else:
+                message = "보유하신 포인트가 부족합니다."
+    
+    if flag == 1:
+        form = Money.objects.filter(status='승인 대기중')
     else:
-        if flag == 1:
-            form = Money.objects.all()
-        else:
-            form = MoneyCreationForm()
+        form = MoneyCreationForm()
+            
     context = {
         'form':form,
-        'flag':flag
+        'flag':flag,
+        'message':message
     }
     return render(request, 'accounts/money_form.html', context)
 
@@ -199,6 +215,39 @@ def refund(request,match_id):
         
         
     return redirect('movies:list')
+
+def check_b(request,check_num,money_id):
+    money = Money.objects.get(pk=money_id)
+    user = get_object_or_404(get_user_model(), pk=money.user.id)
     
+    if check_num == 1:
+        money.status = '승인'
+        money.save()
+    else:
+        money.status = '승인 거절'
+        user.points += money.money
+        user.save()
+        money.save()
+    form = Money.objects.filter(status='승인 대기중')
     
+    context = {
+        'form':form,
+        'flag':1,
+    }
+    return render(request, 'accounts/money_form.html', context)
     
+def payment(request,user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    money = Money.objects.filter(user=user,status='충전')
+    context={
+        'money':money
+    }
+    return render(request, 'accounts/payment.html', context)
+
+def exchange(request,user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    money = Money.objects.filter(user=user).exclude(status='충전')
+    context={
+        'money':money
+    }
+    return render(request, 'accounts/exchange.html', context)
