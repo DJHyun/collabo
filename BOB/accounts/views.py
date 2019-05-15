@@ -214,7 +214,18 @@ def refund(request,match_id):
         usermatchmoney.delete()
         
         
-    return redirect('movies:list')
+    user_infos = get_user_model().objects.get(pk=request.user.id)
+    matches = UserMatchMoney.objects.filter(user=request.user.id)
+    # if request.user.is_authenticated:
+    #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    # else:
+    #     recommend_movie = Score.objects.order_by('-value').first()
+    context={
+        'user_infos':user_infos,
+        # 'recommend_movie':recommend_movie,
+        'matches':matches
+    }
+    return render(request,'accounts/userdetail.html',context)
 
 def check_b(request,check_num,money_id):
     money = Money.objects.get(pk=money_id)
