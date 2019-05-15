@@ -6,7 +6,7 @@
 <p>user name : {{user_infos.username}}</p>
 <p>last name : {{user_infos.last_name}}</p>
 <p>first name : {{user_infos.first_name}}</p>
-
+<p>points : {{user_infos.points }}</p>
 
 <table>
   <tr>
@@ -24,7 +24,6 @@
     <td>{{match.match.date}}</td>
     <td>{{match.match.movie}}</td>
     
-    {{match.updown }}
     
     {% if match.updown == 1 %}
     <td>Up</td>
@@ -43,7 +42,7 @@
     <td>
       <form action = "{% url 'accounts:refund' match.id %}" method = "POST"> 
       {% csrf_token %}
-      <button type="submit" class="btn btn-info">환불하기</button>
+      <button type="submit" class="btn btn-info">취소하기</button>
       </form>
     </td>
     {% endif %}

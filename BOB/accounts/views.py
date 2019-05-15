@@ -156,7 +156,12 @@ def purchase(request,match_id):
 @login_required
 def refund(request,match_id):
     usermatchmoney = get_object_or_404(UserMatchMoney,pk=match_id)
-    usermatchmoney.delete()
+    if request.user == usermatchmoney.user:
+        request.user.points+=usermatchmoney.points
+        request.user.save()
+        usermatchmoney.delete()
+        
+        
     return redirect('movies:list')
     
     
