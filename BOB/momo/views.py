@@ -95,4 +95,4 @@ def moviedetail(request,movie_id):
 # if 
 
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
-getmoviedatalocal()
+# getmoviedatalocal()

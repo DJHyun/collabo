@@ -5,11 +5,14 @@
     <i class="fas fa-video"></i>
     MoMo
   </a>
-    <a class="navbar-brand" href="/accounts/">
+  <a class="navbar-brand" href="/accounts/">
     accounts
   </a>
-    <a class="navbar-brand" href="/admin/">
+  <a class="navbar-brand" href="/admin/">
       admin
+  </a>
+  <a class="navbar-brand" href="{% url 'movies:predict' %}">
+      예측하기
   </a>
   
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,7 +28,7 @@
         <a class="nav-link" tabindex="-1" aria-disabled="true">{{ user }}님 포인트 {{ user.points }} MoMo</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
+        <a class="nav-link" href="{% url 'accounts:user_update' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
       </li>
       
       <li class="nav-item">
@@ -42,3 +45,5 @@
     </ul>
   </div>
 </nav>
+
+
