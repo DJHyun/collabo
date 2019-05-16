@@ -168,35 +168,37 @@ def purchase(request,match_id):
     if request.user.points>=points:
         if request.POST["updown_code"]=='1':
             match = get_object_or_404(Match,pk=match_id)
+            match.usercnt +=1
+            match.save()
             usermatchmoney = UserMatchMoney(match=match,user=request.user)
             usermatchmoney.updown = 1 #up은 1
             usermatchmoney.points = points
             usermatchmoney.save()
             request.user.points -= points
             request.user.save()
-            if request.user in match.user_down.all():
-                match.user_down.remove(request.user)
+            # if request.user in match.user_down.all():
+            #     match.user_down.remove(request.user)
                 
-            if request.user in match.user_up.all():
-                match.user_up.remove(request.user)
-            else:
+            # if request.user in match.user_up.all():
+            #     match.user_up.remove(request.user)
+            # else:
+            if request.user not in match.user_up.all():
                 match.user_up.add(request.user)
         
             return redirect("movies:predict")
             
         elif request.POST["updown_code"]=='2':
             match = get_object_or_404(Match,pk=match_id)
+            match.usercnt +=1
+            match.save()
             usermatchmoney = UserMatchMoney(match=match,user=request.user)
             usermatchmoney.updown = 2 #down은 2
             usermatchmoney.points = points
             usermatchmoney.save()
             request.user.points -= points
             request.user.save()
-            if request.user in match.user_up.all():
-                match.user_up.remove(request.user)
-            if request.user in match.user_down.all():
-                match.user_down.remove(request.user)
-            else:
+            
+            if request.user not in match.user_down.all():
                 match.user_down.add(request.user)
             
             #여기 바꿔야됨

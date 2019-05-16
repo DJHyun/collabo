@@ -162,3 +162,11 @@ def score_delete(request,movie_id,score_id):
 #     elif request.method =="DELETE":
 #         score.delete()
 #         return Response({"message":"삭제되었습니다!"})
+
+def recommandmovie(request):
+
+    recommend_movie = Match.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    context = {
+        'recommandmovie':recommandmovie,
+    }
+    return render(request,"recommand.html",context)

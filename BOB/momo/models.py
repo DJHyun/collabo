@@ -25,6 +25,7 @@ class Match(models.Model):
     date = models.DateField()# 날짜
     uprate = models.FloatField(default = 1)#up 배당
     downrate = models.FloatField(default = 1)#down 배당
+    usercnt = models.IntegerField(default=0)
     
     def __str__(self):
         return f'{self.movie} + {self.date}'
