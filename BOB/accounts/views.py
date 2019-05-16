@@ -23,7 +23,7 @@ def signup(request):
             user = user_form.save()
             Profile.objects.create(user=user)
             auth_login(request, user)
-            return redirect('movies:list')
+            return redirect('accounts:user_detail',user.id)
     else:
         user_form = UserCustomCreationForm()
         
@@ -60,16 +60,14 @@ def user_info(request):
 def user_update(request, user_id):
     user = get_user_model().objects.get(pk=user_id)
     profile = Profile.objects.get(user=user.id)
-    message = False
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            message = "수정되었습니다."
+        return redirect('accounts:user_detail',user.id)
     form = ProfileForm(instance=profile)
     context={
         'form':form,
-        'message':message
     }
     return render(request, 'accounts/forms.html', context)
     
@@ -277,18 +275,21 @@ def exchange(request,user_id):
 def calculate(request):#정산하기...관리자만 사용가능
     if request.user.is_superuser:#관리자만..
         today1 = datetime.datetime.today()
-        for i in range(4,-1,-1):
+        for i in range(3,-1,-1):
             today2 = today1.strftime("%Y-%m-")
             yesterday = today2+str(today1.day-i-1)
             today = today2+str(today1.day-i)
+            print(today, yesterday)
             
             yesterday_matches = Match.objects.filter(date=yesterday)#어제 열린 영화들
             today_matches = Match.objects.filter(date=today)#오늘 열린 영화들
+            print(today_matches)
             for match in yesterday_matches:
                 matches = match.usermatchmoney_set.all()
                 standard_points = 0
                 yesterday_standard = Match.objects.filter(movie=match.movie,date=yesterday)[0].movie.audiCnt
                 for a in range(10):
+                    print(a)
                     if str(today_matches[a].movie) == str(match.movie):
                         standard_points = today_matches[a].movie.audiCnt
                         break

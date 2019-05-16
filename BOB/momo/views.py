@@ -22,10 +22,10 @@ def getmoviedatalocal(request):#데이터수집 영진위에서는 관객정보�
         today1 = datetime.datetime.today()
         # print(today1.strftime("%Y-%m-%d"))
         # print(int(today.strftime("%Y%m%d"))-1)
-        for i in range(3,0,-1):
-            today = int(today1.strftime("%Y%m%d"))-i
+        for i in range(3,-1,-1):
+            today = int(today1.strftime("%Y%m%d"))-i-1
             today2 = today1.strftime("%Y-%m-")
-            yesterday = today2+str(today1.day-i+1)
+            yesterday = today2+str(today1.day-i)
             # print(today1.strftime("%Y-%m-%d"))
             # print(int(today.strftime("%Y%m%d"))-1)
             url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
@@ -73,11 +73,48 @@ def getmoviedatalocal(request):#데이터수집 영진위에서는 관객정보�
                 movie.save()
                 
                 match = Match(movie=movie,standard=movie.audiCnt,date=yesterday)
+                audiChange = float(audiChange)
+                if audiChange<0:
+                   if 0.7*abs(audiChange)>1000:
+                       audiChange/=1000
+                   elif 0.7*abs(audiChange)>100:
+                       audiChange/=100
+                   elif 0.7*abs(audiChange)>10:
+                       audiChange/=10
+                   elif 0.7*abs(audiChange)>5:
+                       audiChange/=5
+                   elif 0.7*abs(audiChange)>2:
+                       audiChange/=2
+                   downrate = 1+0.7*abs(audiChange)
+                   uprate = 4/downrate
+                   if uprate<1:
+                       uprate+=1
+                   if downrate>5:
+                       downrate/=2
+                else:
+                   if 0.7*abs(audiChange)>1000:
+                       audiChange/=1000
+                   elif 0.7*abs(audiChange)>100:
+                       audiChange/=100
+                   elif 0.7*abs(audiChange)>10:
+                       audiChange/=10
+                   elif 0.7*abs(audiChange)>5:
+                       audiChange/=5
+                   elif 0.7*abs(audiChange)>2:
+                       audiChange/=2
+                   uprate = 1+0.7*abs(audiChange)
+                   downrate = 4/uprate
+                   if downrate<1:
+                       downrate+=1
+                   if uprate>5:
+                       uprate/=2
+                match.uprate = "%0.2f" % uprate
+                match.downrate = "%0.2f" % downrate
                 match.save()
     return redirect("movies:list")
 
 def movieList(request):
-    today1 = datetime.datetime.today()
+    today1 = datetime.datetime.today()-datetime.timedelta(days=1)
     # today = int(today.strftime("%Y%m%d"))-1#어제꺼를 기준으로 해야하므로
     print(today1.strftime("%Y-%m-%d"))
     # print(today1.strftime("%Y-%m-(%d-1)"))
@@ -96,13 +133,16 @@ def moviedetail(request,movie_id):
 #모모 구매
 @login_required
 def predict(request):
-    today1 = datetime.datetime.today()
+    today1 = datetime.datetime.today()-datetime.timedelta(days=1)
     matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
     return render(request,'predict.html',{'matches':matches})
 
 # 지난 momo 정보
 def history(request):
-    momos = Match.objects.exclude(date=datetime.datetime.today()).order_by('-date')
+    startdate = datetime.datetime.today()-datetime.timedelta(days=4)
+    enddate = datetime.datetime.today()-datetime.timedelta(days=2)
+    # momos = Match.objects.filter(date=datetime.datetime.today()-datetime.timedelta(days=1)).order_by('-date')
+    momos = Match.objects.filter(date__range=[startdate, enddate]).order_by('-date')
     return render(request,'history.html',{'momos':momos})
         
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장

@@ -1,36 +1,55 @@
 {% extends 'base.html' %}
 
 {% block body %}
-
-<table>
-    <tr>
-        <th>날짜</th>
-        <th>user</th>
-        <th>영화제목</th>
-        <th>points</th>
-        <th>up/down</th>
-    </tr>
+<style>
+    table {
+        counter-reset: rowNumber-1;
+    }
     
-
+    table tr {
+        counter-increment: rowNumber;
+    }
+    
+    table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+    }
+</style>
+<h1>USER 결과 확인</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th scope="col" class="text-center">날짜</th>
+      <th scope="col" class="text-center">user</th>
+      <th scope="col" class="text-center">영화제목</th>
+      <th scope="col" class="text-center">points</th>
+      <th scope="col" class="text-center">up/down</th>
+    </tr>
+  </thead>
+  <tbody>
 {% for match in matches %}
     <tr>
-        <td>{{match.match.date}}</td>
-        <td>{{match.user}}</td>
-        <td>{{match.match.movie.title}}</td>
+        <td class="text-center"></td>
+        <td class="text-center">{{match.match.date}}</td>
+        <td class="text-center">{{match.user}}</td>
+        <td class="text-center">{{match.match.movie.title}}</td>
         
         {% if match.win == 2 %}
-        <td>-{{match.points}}</td>
+        <td class="text-center">-{{match.points}}</td>
         {% else %}
-        <td>{{match.points}}</td>
+        <td class="text-center">{{match.points}}</td>
         {% endif %}
         
         {% if match.updown == 2 %}
-        <td>Down</td>
+        <td class="text-center">Down</td>
         {% else %}
-        <td>Up</td>
+        <td class="text-center">Up</td>
         {% endif %}        
 
     </tr>
 {% endfor %}
-</table>
+      
+
 {% endblock %}
