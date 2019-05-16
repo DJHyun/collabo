@@ -89,8 +89,8 @@
       <thead>
         <tr>
           <th scope="col" class="text-center">유저 이름</th>
-          <th scope="col" class="text-center">계좌 은행</th>
-          <th scope="col" class="text-center">환전 계좌 입력</th>
+          <th scope="col" class="text-center">전용 은행</th>
+          <th scope="col" class="text-center">은행 계좌</th>
           <th scope="col" class="text-center">환전 금액</th>
           <th></th>
         </tr>
@@ -98,13 +98,8 @@
       <tbody>
         <tr>
           <td class="text-center"><input class="text-center" style="border: 0px;" type="text" name="user_id" value="{{user}}" readonly/></td>
-          <td class="text-center"><select name="charge_method">
-              <option value="volvo">신한은행</option>
-              <option value="saab">농협은행</option>
-              <option value="opel">국민은행</option>
-              <option value="audi">하나은행</option>
-            </select></td>
-          <td class="text-center"><input class="text-center" type="text"/></td>
+          <td class="text-center"><input class="text-center" style="border: 0px;" type="text" name="user_id" value="{{ profile.bank }}" readonly/></td>
+          <td class="text-center"><input class="text-center" style="border: 0px;" type="text" name="user_id" value="{{ profile.bank_num }}" readonly/></td>
           <td class="text-center"><input class="text-center" type="number" name="money" min="0"/></td>
           <td><button type="submit" class="btn btn-info">환전 신청</button></td>
         </tr>

@@ -6,12 +6,12 @@ from .models import Money,Profile
 class UserCustomCreationForm(UserCreationForm):
     class Meta:
         model = get_user_model()
-        fields = ['username', 'email','first_name','last_name','bank']
+        fields = ['username', 'email','first_name','last_name']
         
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('__all__')
+        fields = ['phone_num', 'bank','bank_num']
 
 class MoneyCreationForm(forms.ModelForm):
     class Meta:

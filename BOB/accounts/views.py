@@ -58,14 +58,15 @@ def user_info(request):
 
 @login_required
 def user_update(request, user_id):
-    user = Profile.objects.get(id=user_id)
+    user = get_user_model().objects.get(pk=user_id)
+    profile = Profile.objects.get(user=user.id)
     message = False
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=user)
+        form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
             message = "수정되었습니다."
-    form = ProfileForm(instance=user)
+    form = ProfileForm(instance=profile)
     context={
         'form':form,
         'message':message
@@ -74,14 +75,15 @@ def user_update(request, user_id):
     
 @login_required
 def user_detail(request,user_id):
-    user_infos = get_user_model().objects.get(pk=user_id)
+    user = get_user_model().objects.get(pk=user_id)
+    profile = Profile.objects.get(user=user.id)
     matches = UserMatchMoney.objects.filter(user=user_id)
     # if request.user.is_authenticated:
     #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
     # else:
     #     recommend_movie = Score.objects.order_by('-value').first()
     context={
-        'user_infos':user_infos,
+        'user_infos':profile,
         # 'recommend_movie':recommend_movie,
         'matches':matches
     }
@@ -122,9 +124,11 @@ def down_money(request,match_id):
     
 def money(request, flag, user_id):
     message = 0
+    profile = 0
     if request.method == 'POST':
         if flag == 2:
             user = get_object_or_404(get_user_model(), pk=user_id)
+            profile = Profile.objects.get(user=user)
             user.points += int(request.POST['money'])
             user.save()
             Money.objects.create(user=user, money=int(request.POST['money']), status='충전',date=datetime.datetime.today())
@@ -134,8 +138,9 @@ def money(request, flag, user_id):
             }
             return render(request, 'accounts/payment.html', context)
         else:
-            user = get_object_or_404(get_user_model(), pk=user_id)
             if user.points >= int(request.POST['money']):
+                user = get_object_or_404(get_user_model(), pk=user_id)
+                profile = Profile.objects.get(user=user)
                 Money.objects.create(user=user, money=int(request.POST['money']), status='승인 대기중', date=datetime.datetime.today())
                 user.points -= int(request.POST['money'])
                 user.save()
@@ -151,11 +156,13 @@ def money(request, flag, user_id):
         form = Money.objects.filter(status='승인 대기중')
     else:
         form = MoneyCreationForm()
-            
+    
+    
     context = {
         'form':form,
         'flag':flag,
-        'message':message
+        'message':message,
+        'profile':profile
     }
     return render(request, 'accounts/money_form.html', context)
 
@@ -266,42 +273,45 @@ def exchange(request,user_id):
 def calculate(request):#정산하기...관리자만 사용가능
     if request.user.is_superuser:#관리자만..
         today1 = datetime.datetime.today()
-        today2 = today1.strftime("%Y-%m-")
-        yesterday = today2+str(today1.day-1)
-        today = today1.strftime("%Y-%m-%d")
-        
-        yesterday_matches = Match.objects.filter(date=yesterday)#어제 열린 영화들
-        today_matches = Match.objects.filter(date=today)#오늘 열린 영화들
-        for match in yesterday_matches:
-            matches = match.usermatchmoney_set.all()
-            standard_points = 0
-            yesterday_standard = Match.objects.filter(movie=match.movie,date=yesterday)[0].movie.audiCnt
-            for a in range(10):
-                if str(today_matches[a].movie) == str(match.movie):
-                    standard_points = today_matches[a].movie.audiCnt
-                    break
-            if standard_points!=0:
-                if standard_points>yesterday_standard:#up이 맞춤
-                    money_rate = float(match.uprate)#up배당비율
-                    for smallmatch in matches:
-                        if smallmatch.updown==1 and smallmatch.win==0:#up인 사람들만 
-                            smallmatch.user.points += int(smallmatch.points*money_rate)
-                            smallmatch.win = 1#승리
-                            smallmatch.save()
-                            smallmatch.user.save()
-                        elif smallmatch.updown==2 and smallmatch.win==0:
-                            smallmatch.win = 2#패배
-                            smallmatch.save()
-                else:#down이 맞춤
-                    money_rate = float(match.downrate)#down배당비율
-                    for smallmatch in matches:
-                        if smallmatch.updown==2 and smallmatch.win==0:#down인 사람들만 
-                            smallmatch.user.points += int(smallmatch.points*money_rate)
-                            smallmatch.win = 1#승리
-                            smallmatch.save()
-                            smallmatch.user.save()
-                        elif smallmatch.updown==1 and smallmatch.win==0:
-                            smallmatch.win = 2#패배
-                            smallmatch.save()
+        for i in range(5,0,-1):
+            today2 = today1.strftime("%Y-%m-")
+            yesterday = today2+str(today1.day-i-1)
+            today = today2+str(today1.day-i)
+            
+            yesterday_matches = Match.objects.filter(date=yesterday)#어제 열린 영화들
+            today_matches = Match.objects.filter(date=today)#오늘 열린 영화들
+            for match in yesterday_matches:
+                matches = match.usermatchmoney_set.all()
+                standard_points = 0
+                yesterday_standard = Match.objects.filter(movie=match.movie,date=yesterday)[0].movie.audiCnt
+                for a in range(10):
+                    if str(today_matches[a].movie) == str(match.movie):
+                        standard_points = today_matches[a].movie.audiCnt
+                        break
+                if standard_points!=0:
+                    if standard_points>yesterday_standard:#up이 맞춤
+                        money_rate = float(match.uprate)#up배당비율
+                        for smallmatch in matches:
+                            if smallmatch.updown==1 and smallmatch.win==0:#up인 사람들만 
+                                smallmatch.user.points += int(smallmatch.points*money_rate)
+                                smallmatch.win = 1#승리
+                                smallmatch.save()
+                                smallmatch.user.save()
+                            elif smallmatch.updown==2 and smallmatch.win==0:
+                                smallmatch.win = 2#패배
+                                smallmatch.save()
+                        match.result = 1
+                        match.save()
+                    else:#down이 맞춤
+                        money_rate = float(match.downrate)#down배당비율
+                        for smallmatch in matches:
+                            if smallmatch.updown==2 and smallmatch.win==0:#down인 사람들만 
+                                smallmatch.user.points += int(smallmatch.points*money_rate)
+                                smallmatch.win = 1#승리
+                                smallmatch.save()
+                                smallmatch.user.save()
+                            elif smallmatch.updown==1 and smallmatch.win==0:
+                                smallmatch.win = 2#패배
+                                smallmatch.save()
     ##정산한결과 보여주기로 바꾸자
     return redirect('movies:list')

@@ -9,19 +9,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <style>
-      footer {
-        background-color: #31708F;
-        color: white;
-        flex-shrink: 0;
-    }
-    
-    footer > div.footer-copyright {
-        background-color: #36495D;
-        color: white;
-    }
-
-    </style>
     <title>MoMo</title>
 </head>
 <body>
@@ -42,7 +29,7 @@
                         <button class="btn btn-outline-info btn-block" onclick="location.href='{% url 'movies:list' %}'">오늘 MoMo 정보</button>
                     </li>
                     <li class="nav-item mt-2">
-                        <button class="btn btn-outline-info btn-block">지난 MoMo 정보</button>
+                        <button class="btn btn-outline-info btn-block" onclick="location.href='{% url 'movies:history' %}'">지난 MoMo 정보</button>
                     </li>
                     
                     <li class="nav-item mt-2">
@@ -75,35 +62,6 @@
     </div>
 
 
-<!-- Footer -->
-<footer class="page-footer font-small pt-4">
-    <div class="container-fluid text-center text-md-left">
-        <div class="row">
-            <div class="col-md-6 mt-md-0 mt-3">
-                <h5 class="text-uppercase">MOMO</h5>
-                <p>먹튀 없는 영화 MoMo 사이트</p>
-            </div>
-            <hr class="clearfix w-100 d-md-none pb-3">
-            <div class="col-md-3 offset-md-3 mb-md-0 mb-3">
-                <h5 class="text-uppercase">Links</h5>
-                <ul class="list-unstyled">
-                    <li>
-                        <a href="#!">Link 1</a>
-                    </li>
-                    <li>
-                        <a href="#!">Link 2</a>
-                    </li>
-                    <li>
-                        <a href="#!">Link 3</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="footer-copyright text-center py-3">
-        전화 문의 : 010-2955-1509 대표 김동환
-    </div>
-</footer>
 </div>
     <!--{% if user.is_authenticated %}-->
     <!--    <p>{{ user.username }}</p>-->

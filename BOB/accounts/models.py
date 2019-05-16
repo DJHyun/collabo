@@ -7,9 +7,9 @@ class User(AbstractUser):
     points = models.PositiveIntegerField(default=0)
 
 class Profile(models.Model):
-    phone_num = models.TextField(blank=True)
-    bank = models.TextField(blank=True)
-    bank_num = models.IntegerField(blank=True)
+    phone_num = models.CharField(max_length=50, blank=True)
+    bank = models.CharField(max_length=20,blank=True)
+    bank_num = models.CharField(max_length=20,blank=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
 class Money(models.Model):

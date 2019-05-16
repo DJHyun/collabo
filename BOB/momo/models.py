@@ -22,9 +22,10 @@ class Match(models.Model):
     user_up = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="up",blank=True)
     user_down = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="down",blank=True)
     standard = models.PositiveIntegerField(default = 0)# 기준관객수
-    date = models.DateField(auto_now_add=True)# 날짜
+    date = models.DateField()# 날짜
     uprate = models.FloatField(default = 1)#up 배당
     downrate = models.FloatField(default = 1)#down 배당
+    result = models.IntegerField(default = 0)
     
     def __str__(self):
         return f'{self.movie} + {self.date}'
@@ -32,8 +33,8 @@ class Match(models.Model):
 class UserMatchMoney(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    updown = models.IntegerField(default=0)
-    points = models.IntegerField(default=0)# 1은 up 2는 down
+    updown = models.IntegerField(default=0)# 1은 up 2는 down
+    points = models.IntegerField(default=0)
     win = models.IntegerField(default=0)#0은 아직 상태 모름 1은 이김 2는 짐
     
     def __str__(self):
