@@ -80,6 +80,8 @@ def user_detail(request,user_id):
     #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
     # else:
     #     recommend_movie = Score.objects.order_by('-value').first()
+    if request.user.is_superuser :
+        matches = UserMatchMoney.objects.all()
     context={
         'user_infos':user_infos,
         # 'recommend_movie':recommend_movie,
@@ -303,8 +305,18 @@ def calculate(request):#정산하기...관리자만 사용가능
                         elif smallmatch.updown==1 and smallmatch.win==0:
                             smallmatch.win = 2#패배
                             smallmatch.save()
+            else:
+                for smallmatch in matches:
+                    smallmatch.win = 3#무승부
+                    smallmatch.user.points += int(smallmatch.points)
+                    smallmatch.save()
+                    smallmatch.user.save()
+            
+        matches = UserMatchMoney.objects.exclude(win=0)
+        return render(request,"accounts/calculate.html",{'matches':matches})
+    else:
     ##정산한결과 보여주기로 바꾸자
-    return redirect('movies:list')
+        return redirect('movies:list')
 
 
 

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'accounts',
     'momo',
     'bootstrap4',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

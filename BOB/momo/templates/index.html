@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
 
 {% block body %}
   
@@ -26,7 +27,87 @@
           <p class="card-text">
               <small class="text-muted">{{match.movie.audience}}</small>
           </p>
-          <a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">MoMo 상세 보기</a>
+          <!-- modal시작 -->
+          <!--<a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">MoMo 상세 보기</a>-->
+          
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{match.id}}">
+            MoMo 상세 보기
+          </button>
+          
+          <!-- Modal -->
+          
+            
+          <div class="modal fade" id="modal{{match.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modal{{match.id}}Title">{{ match.movie.title }}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                      
+                      <div class="row">
+                        <img class="col-6" src={{match.movie.poster_url}} style="height:66%;width:33%"></img>
+                        <div class="col-6">
+                        <p>어제 관객수 : {{match.movie.audiCnt}}</p>
+                        <p>전일대비 증감수 : {{match.movie.audinten}}</p>
+                        <p>전일대비 증감비율 : {{match.movie.audiChange}} %</p>
+                        <p>누적관객수 : {{match.movie.audiAcc}} 명</p>
+                        <p>네이버평점 : {{match.movie.userRating}} 점</p>
+                        
+                        
+                        <!--평점 넣기 추가-->
+                        <h3 class="row justify-content-start">영화평점 & 한줄댓글</h3>
+                        <table>
+                          
+                        
+                        {% for score in match.score_set.all %}
+                          <tr>
+                              <td>{{score.user}} : </td>
+                              <td>{{ score.value }} 점 - </td> 
+                              <td>{{ score.content }}</td> 
+                              
+                          {% if score.user == request.user %}
+                              <td><a class='btn btn-danger' href="{% url 'movies:score_delete' match.id score.id %}">삭제</a></td>
+                          {% endif %}  
+                          </tr>
+                        {% endfor %}
+                        </table>
+
+                          
+                          <hr>
+                          
+                
+                          {% if user.is_authenticated %}
+                          <h3 class="row justify-content-start">평점 & 한줄댓글 쓰기</h3>
+                          <form method="POST" action="{% url 'movies:create_score' match.id %}">
+                            {% csrf_token %}
+                            {% bootstrap_form score_form %}
+                            <button type="submit" class="btn btn-warning">한줄평점</button>
+                          </form>
+                          {% endif %}
+                          
+                        </div>
+                        
+                        
+                      </div>
+                    </div>
+                  
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          
+          <!--modal 끝-->
         </div>  
       </div>
       
@@ -44,14 +125,15 @@
       </div>
     </div>
     </div>
-  {% endfor %}                  
+  {% endfor %} 
+  
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth()+1; //1월은 0
     var yyyy = today.getFullYear();
     
     if(dd<10) {
@@ -61,44 +143,22 @@
     if(mm<10) {
      mm='0'+mm
     }
-    
     today = yyyy+mm+dd
     const app = new Vue({
+      delimiters: ['[[',']]'],
       el: '#main',
       data: {
         // c9 주소
-        url: 'https://openapi.naver.com/v1/search/movie?query?',
-        params: {
-          'key':'db2280283c7ae6f2389c5ab040847efe',
-          'targetDt':today-1,
-          'itemPerPage':10
-        },
-        content: '',
-        memos: [],
+        rows:[{'user':'나는','value':'1','content':'누눅'},{'user':'나는','value':'1','content':'누눅'}],
         
       },
       methods: {
-        // 서버로 요청을 보내서 memo를 작성하고 응답받은 memo 데이터를 this.memos에 push
-        writeMemo: function () {
-          axios.get(`${this.url}key=${this.params.key}&targetDt=${this.params.targetDt}&itemPerPage=${this.params.itemPerPage}`)
-            .then(response => {
-              this.getMethod()
-              this.content = ''
-              console.log(response.data)
-            })
-          axios.get(``)
+        addRow:function(){
+          this.rows.push()
         },
-        getMethod: function(){
-          axios.get(this.url)
-          .then(response => {
-            this.memos = response.data
-          })
+        removeRow:function(row){
+          this.rows.$remove(row)
         },
-        delete_memo: function(memo_id){
-          console.log(memo_id)
-          axios.delete(this.url+memo_id+"/")
-          this.getMethod()
-        }
       },
       // 서버로 요청을 보내서 memeos를 불러온 뒤 this.memos에 할당
       created: function () {

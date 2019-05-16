@@ -8,9 +8,14 @@
 <p>first name : {{user_infos.first_name}}</p>
 <p>points : {{user_infos.points }}</p>
 
+
 <table>
   <tr>
     <th>참가한 날짜</th>
+    {% if user.is_superuser %}
+    <th>user</th>
+    {% endif %}
+
     <th>영화제목</th>
     <th>up/down</th>
     <th>배당율</th>  
@@ -22,6 +27,9 @@
   {% for match in matches %}
   <tr>
     <td>{{match.match.date}}</td>
+    {% if user.is_superuser %}
+    <td>{{match.user}}</td>
+    {% endif %}
     <td>{{match.match.movie}}</td>
     
     
@@ -38,7 +46,10 @@
     <td>승</td>
     {% elif match.win == 2 %}
     <td>패</td>
+    {% elif match.win == 3 %}
+    <td>무승부</td>
     {% else %}
+    {% if not user.is_superuser %}
     <td>
       <form action = "{% url 'accounts:refund' match.id %}" method = "POST"> 
       {% csrf_token %}
@@ -46,8 +57,11 @@
       </form>
     </td>
     {% endif %}
+    {% endif %}
   </tr>
   {% endfor %}
 
 </table>      
+
+
 {% endblock %}
