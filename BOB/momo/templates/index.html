@@ -1,57 +1,176 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
+
+<style>
+    table {
+        counter-reset: rowNumber-1;
+    }
+    
+    table tr {
+        counter-increment: rowNumber;
+    }
+    
+    table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+    }
+</style>
 
 {% block body %}
-  
+    <div class="card">
+    <div class="row">
   {% for match in matches %}
     
-  <div class="card">
-    <div class="row">
-      <div class="col-3 d-flex justify-content-center align-self-center">
-        <!--<a href="{% url 'accounts:up_money' match.id %}">-->
-          {% if request.user in match.user_up.all %}
-          <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:red;" ></i>
-          <br><p style="font-size:5rem;color:red">X {{match.uprate}}</p>
-          {% else %}
-          <i class="fas fa-thumbs-up d-flex justify-content-center" style="font-size:5rem;color:black;" ></i>
-          <br><p style="font-size:5rem;color:black">X {{match.uprate}}</p>
-          {% endif %}
-          
-        <!--</a>-->
-      </div>
-      
-      <div class="col-6">
+
+      <div class="col-4">
         <div class="card-body text-center">
-        <img class="card-img-top" src={{match.movie.poster_url}} alt={{match.movie.title}}>  
-          <h5 class="card-title">{{match.movie.title}}</h5>
-          <p class="card-text">
-              <small class="text-muted">{{match.movie.audience}}</small>
-          </p>
-          <a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">MoMo 상세 보기</a>
+        <a data-toggle="modal" data-target="#modal{{match.id}}" >
+        <figure class="snip1283">
+          <img class="card-img-top" src={{match.movie.poster_url}} alt="{{match.movie.title}}"/>
+          <figcaption>
+            <h3 class="card-text">{{match.movie.title}}</h3>
+            <hr>
+            
+            <hr>
+            <p>오늘의 기준 : {{match.movie.audiCnt}}</p>
+            <p>누적관객수 : {{match.movie.auidAcc}}</p>
+            
+            <p>UP 배율 : X {{match.uprate }} </p>
+            <p>DOWN 배율 : X {{match.downrate }}</p>
+            
+            
+            <!--<button type="button" class="read-more" data-toggle="modal" data-target="#modal{{match.id}}">-->
+            <!--MoMo 상세 보기-->
+            <!--</button>-->
+          </figcaption>
+
+        </figure>
+        </a>        
+          
+        <!--<figure class="snip1200">-->
+        <!--  <img src={{match.movie.poster_url}} alt="{{match.movie.title}}" />-->
+        <!--  <figcaption>-->
+        <!--    <p>오늘의 기준 : {{match.movie.audiCnt}}<br>-->
+        <!--    누적관객수 : {{match.movie.auidAcc}}<br>-->
+        <!--    UP 배율 : X {{match.uprate }}<br>-->
+        <!--    DOWN 배율 : X {{match.downrate }}<br>-->
+            
+        <!--    </p>-->
+            
+        <!--  </figcaption>-->
+        <!--  <a data-toggle="modal" data-target="#modal{{match.id}}" ></a>-->
+        <!--</figure>-->
+
+        
+        
+          
+
+          <!-- modal시작 -->
+          <!--<a href="#" class="btn btn-primary" @click="toggleDetail(match.movie.id)">MoMo 상세 보기</a>-->
+          
+          <!-- Button trigger modal -->
+          
+          
+          <!-- Modal -->
+          <a data-toggle="modal" data-target="#modal{{match.id}}" >
+            </a>
+          <div class="modal fade" id="modal{{match.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modal{{match.id}}Title">{{ match.movie.title }}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                      
+                      <div class="row">
+                        <img class="col-6" src={{match.movie.poster_url}} style="height:66%;width:33%"></img>
+                        <div class="col-6">
+                        <p>어제 관객수 : {{match.movie.audiCnt}}</p>
+                        <p>전일대비 증감수 : {{match.movie.audinten}}</p>
+                        <p>전일대비 증감비율 : {{match.movie.audiChange}} %</p>
+                        <p>누적관객수 : {{match.movie.auidAcc}} 명</p>
+                        <p>네이버평점 : {{match.movie.userRating}} 점</p>
+                        
+                        
+                        <!--평점 넣기 추가-->
+                        <h3 class="row justify-content-start">영화평점 & 한줄댓글</h3>
+                        <table class="table">
+                          <tbody>
+                            {% for score in match.score_set.all %}
+                            <tr>
+                              <td scope="row">{{score.user}} : </td>
+                              <td>{{ score.value }} 점 </td>
+                              <td>{{ score.content }}</td>
+                              {% if score.user == request.user %}
+                              <td><a class='btn btn-danger' href="{% url 'movies:score_delete' match.id score.id %}">삭제</a></td>
+                              {% endif %} 
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                          
+                          <hr>
+                          
+                
+                          {% if user.is_authenticated %}
+                          <h3 class="row justify-content-start">평점 & 한줄댓글 쓰기</h3>
+                          <form method="POST" action="{% url 'movies:create_score' match.id %}">
+                            {% csrf_token %}
+                            {% bootstrap_form score_form %}
+                            <button type="submit" class="btn btn-warning">한줄평점</button>
+                          </form>
+                          {% endif %}
+                          
+                        </div>
+                        
+                        
+                      </div>
+                    </div>
+                  
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          
+          
+          <!--modal 끝-->
         </div>  
       </div>
       
-      <div class="col-3 d-flex justify-content-center align-self-center">
-        <!--<a href="{% url 'accounts:down_money' match.id %}">-->
-          {% if request.user in match.user_down.all %}
-          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:red"></i>
-          <br><p style="font-size:5rem;color:red">X {{match.downrate}}</p>
-          {% else %}
-          <i class="fas fa-thumbs-down d-flex justify-content-center" style="font-size:5rem;color:black"></i>
-          <br><p style="font-size:5rem;color:black">X {{match.downrate}}</p>
-          {% endif %}
-          
-        <!--</a>-->
+
+
+  {% endfor %} 
       </div>
     </div>
-    </div>
-  {% endfor %}                  
+    
+    
+
+    
+
+
+
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
+    $(".hover").mouseleave(
+      function () {
+        $(this).removeClass("hover");
+      }
+    );
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth()+1; //1월은 0
     var yyyy = today.getFullYear();
     
     if(dd<10) {
@@ -61,44 +180,22 @@
     if(mm<10) {
      mm='0'+mm
     }
-    
     today = yyyy+mm+dd
     const app = new Vue({
+      delimiters: ['[[',']]'],
       el: '#main',
       data: {
         // c9 주소
-        url: 'https://openapi.naver.com/v1/search/movie?query?',
-        params: {
-          'key':'db2280283c7ae6f2389c5ab040847efe',
-          'targetDt':today-1,
-          'itemPerPage':10
-        },
-        content: '',
-        memos: [],
+        rows:[{'user':'나는','value':'1','content':'누눅'},{'user':'나는','value':'1','content':'누눅'}],
         
       },
       methods: {
-        // 서버로 요청을 보내서 memo를 작성하고 응답받은 memo 데이터를 this.memos에 push
-        writeMemo: function () {
-          axios.get(`${this.url}key=${this.params.key}&targetDt=${this.params.targetDt}&itemPerPage=${this.params.itemPerPage}`)
-            .then(response => {
-              this.getMethod()
-              this.content = ''
-              console.log(response.data)
-            })
-          axios.get(``)
+        addRow:function(){
+          this.rows.push()
         },
-        getMethod: function(){
-          axios.get(this.url)
-          .then(response => {
-            this.memos = response.data
-          })
+        removeRow:function(row){
+          this.rows.$remove(row)
         },
-        delete_memo: function(memo_id){
-          console.log(memo_id)
-          axios.delete(this.url+memo_id+"/")
-          this.getMethod()
-        }
       },
       // 서버로 요청을 보내서 memeos를 불러온 뒤 this.memos에 할당
       created: function () {

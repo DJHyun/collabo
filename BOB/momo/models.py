@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
 # Create your models here.
 class Movie(models.Model):
     title = models.CharField(max_length=120) # 영화 제목
@@ -17,7 +16,6 @@ class Movie(models.Model):
         return self.title
         
 class Match(models.Model):
-    
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     user_up = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="up",blank=True)
     user_down = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="down",blank=True)
@@ -25,7 +23,8 @@ class Match(models.Model):
     date = models.DateField()# 날짜
     uprate = models.FloatField(default = 1)#up 배당
     downrate = models.FloatField(default = 1)#down 배당
-    result = models.IntegerField(default = 0)
+    result = models.IntegerField(blank=True, null=True)
+    usercnt = models.IntegerField(default=0)
     
     def __str__(self):
         return f'{self.movie} + {self.date}'
@@ -39,3 +38,9 @@ class UserMatchMoney(models.Model):
     
     def __str__(self):
         return f"{self.user}가 {self.match}에 {self.points}를 걸었다"
+        
+class Score(models.Model):
+    content = models.CharField(max_length=120)
+    value = models.IntegerField()
+    match = models.ForeignKey(Match,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)

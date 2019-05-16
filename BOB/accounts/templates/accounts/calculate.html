@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<table>
+    <tr>
+        <th>날짜</th>
+        <th>user</th>
+        <th>영화제목</th>
+        <th>points</th>
+        <th>up/down</th>
+    </tr>
+    
+
+{% for match in matches %}
+    <tr>
+        <td>{{match.match.date}}</td>
+        <td>{{match.user}}</td>
+        <td>{{match.match.movie.title}}</td>
+        
+        {% if match.win == 2 %}
+        <td>-{{match.points}}</td>
+        {% else %}
+        <td>{{match.points}}</td>
+        {% endif %}
+        
+        {% if match.updown == 2 %}
+        <td>Down</td>
+        {% else %}
+        <td>Up</td>
+        {% endif %}        
+
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

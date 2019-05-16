@@ -82,6 +82,8 @@ def user_detail(request,user_id):
     #     recommend_movie = Score.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
     # else:
     #     recommend_movie = Score.objects.order_by('-value').first()
+    if request.user.is_superuser :
+        matches = UserMatchMoney.objects.all()
     context={
         'user_infos':profile,
         # 'recommend_movie':recommend_movie,
@@ -138,8 +140,8 @@ def money(request, flag, user_id):
             }
             return render(request, 'accounts/payment.html', context)
         else:
+            user = get_object_or_404(get_user_model(), pk=user_id)
             if user.points >= int(request.POST['money']):
-                user = get_object_or_404(get_user_model(), pk=user_id)
                 profile = Profile.objects.get(user=user)
                 Money.objects.create(user=user, money=int(request.POST['money']), status='승인 대기중', date=datetime.datetime.today())
                 user.points -= int(request.POST['money'])
@@ -173,35 +175,37 @@ def purchase(request,match_id):
     if request.user.points>=points:
         if request.POST["updown_code"]=='1':
             match = get_object_or_404(Match,pk=match_id)
+            match.usercnt +=1
+            match.save()
             usermatchmoney = UserMatchMoney(match=match,user=request.user)
             usermatchmoney.updown = 1 #up은 1
             usermatchmoney.points = points
             usermatchmoney.save()
             request.user.points -= points
             request.user.save()
-            if request.user in match.user_down.all():
-                match.user_down.remove(request.user)
+            # if request.user in match.user_down.all():
+            #     match.user_down.remove(request.user)
                 
-            if request.user in match.user_up.all():
-                match.user_up.remove(request.user)
-            else:
+            # if request.user in match.user_up.all():
+            #     match.user_up.remove(request.user)
+            # else:
+            if request.user not in match.user_up.all():
                 match.user_up.add(request.user)
         
             return redirect("movies:predict")
             
         elif request.POST["updown_code"]=='2':
             match = get_object_or_404(Match,pk=match_id)
+            match.usercnt +=1
+            match.save()
             usermatchmoney = UserMatchMoney(match=match,user=request.user)
             usermatchmoney.updown = 2 #down은 2
             usermatchmoney.points = points
             usermatchmoney.save()
             request.user.points -= points
             request.user.save()
-            if request.user in match.user_up.all():
-                match.user_up.remove(request.user)
-            if request.user in match.user_down.all():
-                match.user_down.remove(request.user)
-            else:
+            
+            if request.user not in match.user_down.all():
                 match.user_down.add(request.user)
             
             #여기 바꿔야됨
@@ -273,7 +277,7 @@ def exchange(request,user_id):
 def calculate(request):#정산하기...관리자만 사용가능
     if request.user.is_superuser:#관리자만..
         today1 = datetime.datetime.today()
-        for i in range(5,0,-1):
+        for i in range(4,-1,-1):
             today2 = today1.strftime("%Y-%m-")
             yesterday = today2+str(today1.day-i-1)
             today = today2+str(today1.day-i)
@@ -313,5 +317,66 @@ def calculate(request):#정산하기...관리자만 사용가능
                             elif smallmatch.updown==1 and smallmatch.win==0:
                                 smallmatch.win = 2#패배
                                 smallmatch.save()
+                        match.result = 2
+                        match.save()
+        matches = UserMatchMoney.objects.exclude(win=0)
+        return render(request,"accounts/calculate.html",{'matches':matches})
     ##정산한결과 보여주기로 바꾸자
     return redirect('movies:list')
+# =======
+#         today2 = today1.strftime("%Y-%m-")
+#         yesterday = today2+str(today1.day-1)
+#         today = today1.strftime("%Y-%m-%d")
+        
+#         yesterday_matches = Match.objects.filter(date=yesterday)#어제 열린 영화들
+#         today_matches = Match.objects.filter(date=today)#오늘 열린 영화들
+#         for match in yesterday_matches:
+#             matches = match.usermatchmoney_set.all()
+#             standard_points = 0
+#             yesterday_standard = Match.objects.filter(movie=match.movie,date=yesterday)[0].movie.audiCnt
+#             for a in range(10):
+#                 if str(today_matches[a].movie) == str(match.movie):
+#                     standard_points = today_matches[a].movie.audiCnt
+#                     break
+#             if standard_points!=0:
+#                 if standard_points>yesterday_standard:#up이 맞춤
+#                     money_rate = float(match.uprate)#up배당비율
+#                     for smallmatch in matches:
+#                         if smallmatch.updown==1 and smallmatch.win==0:#up인 사람들만 
+#                             smallmatch.user.points += int(smallmatch.points*money_rate)
+#                             smallmatch.win = 1#승리
+#                             smallmatch.save()
+#                             smallmatch.user.save()
+#                         elif smallmatch.updown==2 and smallmatch.win==0:
+#                             smallmatch.win = 2#패배
+#                             smallmatch.save()
+#                 else:#down이 맞춤
+#                     money_rate = float(match.downrate)#down배당비율
+#                     for smallmatch in matches:
+#                         if smallmatch.updown==2 and smallmatch.win==0:#down인 사람들만 
+#                             smallmatch.user.points += int(smallmatch.points*money_rate)
+#                             smallmatch.win = 1#승리
+#                             smallmatch.save()
+#                             smallmatch.user.save()
+#                         elif smallmatch.updown==1 and smallmatch.win==0:
+#                             smallmatch.win = 2#패배
+#                             smallmatch.save()
+#             else:
+#                 for smallmatch in matches:
+#                     smallmatch.win = 3#무승부
+#                     smallmatch.user.points += int(smallmatch.points)
+#                     smallmatch.save()
+#                     smallmatch.user.save()
+            
+#         matches = UserMatchMoney.objects.exclude(win=0)
+#         return render(request,"accounts/calculate.html",{'matches':matches})
+#     else:
+#     ##정산한결과 보여주기로 바꾸자
+#         return redirect('movies:list')
+
+
+
+
+                
+    
+# >>>>>>> 77fcb6fd13398d1163fe56b7cbd05710b15272e7

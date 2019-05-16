@@ -1,12 +1,12 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 import datetime
 import requests
 import json
-from .models import Movie,Match,UserMatchMoney
+from .models import Movie,Match,UserMatchMoney,Score
+from .forms import ScoreForm
 import os
 from bs4 import BeautifulSoup
 from django.contrib.auth.decorators import login_required
-
 # Create your views here.
 naver_secret = os.getenv('NAVERSECRET')
 naver_id = os.getenv("NAVERID")
@@ -85,8 +85,8 @@ def movieList(request):
     # movies = Movie.objects.all()
     
     matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
-    
-    return render(request, 'index.html', {'matches':matches})
+    score_form = ScoreForm()
+    return render(request, 'index.html', {'matches':matches,'score_form':score_form})
 
 def moviedetail(request,movie_id):
     movie = Movie.objects.get(pk=movie_id)
@@ -108,3 +108,64 @@ def history(request):
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
 # getmoviedatalocal()
 # print('다운 끝')
+
+
+# def momodetail(request,match_id):
+#     return
+
+
+@login_required
+def create_score(request,match_id):
+    score_form = ScoreForm(request.POST)
+    if score_form.is_valid():
+        score = score_form.save(commit=False)
+        score.user = request.user
+        score.match_id = match_id
+        score.save()
+        
+    return redirect('movies:list')
+
+def score_delete(request,match_id,score_id):
+    score = get_object_or_404(Score,pk=score_id)
+    if score.user==request.user:
+        score.delete()
+    return redirect('movies:list')
+    
+    
+    
+    # 참고해보자..
+# https://github.com/anhaeh/forms-vue.js-django/blob/master/app/views.py
+
+
+# @api_view(['POST'])
+# def create_score(request, match_id):
+#     match = get_object_or_404(Match,pk=match_id)
+#     serializer = ScoreSerializer(data=request.data)
+#     if serializer.is_valid(raise_exception=True):
+#         serializer.save()
+#         return Response({"messages":"작성되었습니다."})
+        
+# @api_view(['GET','PUT','DELETE'])        
+# def score(request,score_pk):
+#     score = get_object_or_404(Score, pk=score_pk)
+#     if request.method =="GET":# 보여주기
+#         serializer = ScoreSerializer(score,many=False)
+#         return Response(data=serializer.data)
+        
+#     elif request.method =="PUT":# 업데이트
+#         serializer = ScoreSerializer(score,many=False,data=request.data)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             return Response({"messages":"수정되었습니다."})
+        
+#     elif request.method =="DELETE":
+#         score.delete()
+#         return Response({"message":"삭제되었습니다!"})
+
+def recommandmovie(request):
+
+    recommend_movie = Match.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    context = {
+        'recommandmovie':recommandmovie,
+    }
+    return render(request,"recommand.html",context)

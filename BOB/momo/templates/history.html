@@ -37,10 +37,12 @@
       <td class="text-center">{{ momo.uprate }}</td>
       <td class="text-center">{{ momo.standard }}</td>
       <td class="text-center">{{ momo.downrate }}</td>
-      {% if momo.result %}
+      {% if momo.result == 1 %}
       <td class="text-center">UP</td>
-      {% else %}
+      {% elif momo.result == 2 %}
       <td class="text-center">DOWN</td>
+      {% else %}
+      <td class="text-center"></td>
       {% endif %}
     </tr>
     {% endfor %}
