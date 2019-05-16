@@ -204,8 +204,9 @@ def score_delete(request,match_id,score_id):
 
 def recommandmovie(request):
 
-    recommend_movie = Match.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    recommand_movie = Match.objects.order_by('-usercnt').first()
+    
     context = {
-        'recommandmovie':recommandmovie,
+        'recommandmovie':recommand_movie,
     }
     return render(request,"recommand.html",context)
