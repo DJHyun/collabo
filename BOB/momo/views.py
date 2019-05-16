@@ -125,7 +125,7 @@ def create_score(request,match_id):
         
     return redirect('movies:list')
 
-def score_delete(request,movie_id,score_id):
+def score_delete(request,match_id,score_id):
     score = get_object_or_404(Score,pk=score_id)
     if score.user==request.user:
         score.delete()
