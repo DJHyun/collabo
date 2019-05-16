@@ -23,7 +23,7 @@
   {% for match in matches %}
     
 
-      <div class="col-4">
+      <div class="col-6">
         <div class="card-body text-center">
         <a data-toggle="modal" data-target="#modal{{match.id}}" >
         <figure class="snip1283">
@@ -95,6 +95,8 @@
                         <p>전일대비 증감비율 : {{match.movie.audiChange}} %</p>
                         <p>누적관객수 : {{match.movie.auidAcc}} 명</p>
                         <p>네이버평점 : {{match.movie.userRating}} 점</p>
+                        <p>UP 배율 : X {{match.uprate }} </p>
+                        <p>DOWN 배율 : X {{match.downrate }}</p>
                         
                         
                         <!--평점 넣기 추가-->

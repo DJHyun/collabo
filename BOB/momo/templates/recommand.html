@@ -1,4 +1,36 @@
 {% extends 'base.html' %}
 {% block body %}
 
+
+<div class="card text-center">
+    <div class="row">
+        
+    
+        <div class="col-6">
+          <img class="card-img" src={{recommandmovie.movie.poster_url}} alt="{{recommandmovie.movie.title}}"/>
+        </div>
+        <div class="col-6 card-text">
+            <h3>{{recommandmovie.movie.title}}</h3>
+            <hr>
+            <p>오늘의 기준 : {{recommandmovie.movie.audiCnt}}</p>
+            <p>누적관객수 : {{recommandmovie.movie.auidAcc}}</p>
+            <p>전일대비 증감수 : {{ recommandmovie.movie.audinten }}</p>
+            <p>전일대비 증감 비율 : {{ recommandmovie.movie.audiChange }}</p>
+            <p>네이버 평점 : {{ recommandmovie.movie.userRating }}</p>
+            <p>관심갖는 사람수 : {{ recommandmovie.usercnt }}</p>
+            <p>UP 배율 : X {{recommandmovie.uprate }} </p>
+            <p>DOWN 배율 : X {{recommandmovie.downrate }}</p>
+        </div>
+    </div>
+</div>
+    
+
 {% endblock %}
+
+<script>
+    $(".hover").mouseleave(
+      function () {
+        $(this).removeClass("hover");
+      }
+    );
+</script>

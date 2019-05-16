@@ -73,6 +73,43 @@ def getmoviedatalocal(request):#데이터수집 영진위에서는 관객정보�
                 movie.save()
                 
                 match = Match(movie=movie,standard=movie.audiCnt,date=yesterday)
+                audiChange = float(audiChange)
+                if audiChange<0:
+                    if 0.7*abs(audiChange)>1000:
+                        audiChange/=1000
+                    elif 0.7*abs(audiChange)>100:
+                        audiChange/=100
+                    elif 0.7*abs(audiChange)>10:
+                        audiChange/=10
+                    elif 0.7*abs(audiChange)>5:
+                        audiChange/=5
+                    elif 0.7*abs(audiChange)>2:
+                        audiChange/=2
+                    downrate = 1+0.7*abs(audiChange)
+                    uprate = 4/downrate
+                    if uprate<1:
+                        uprate+=1
+                    if downrate>5:
+                        downrate/=2
+                else:
+                    if 0.7*abs(audiChange)>1000:
+                        audiChange/=1000
+                    elif 0.7*abs(audiChange)>100:
+                        audiChange/=100
+                    elif 0.7*abs(audiChange)>10:
+                        audiChange/=10
+                    elif 0.7*abs(audiChange)>5:
+                        audiChange/=5
+                    elif 0.7*abs(audiChange)>2:
+                        audiChange/=2
+                    uprate = 1+0.7*abs(audiChange)
+                    downrate = 4/uprate
+                    if downrate<1:
+                        downrate+=1
+                    if uprate>5:
+                        uprate/=2
+                match.uprate = uprate
+                match.downrate = downrate
                 match.save()
     return redirect("movies:list")
 
@@ -164,8 +201,9 @@ def score_delete(request,match_id,score_id):
 
 def recommandmovie(request):
 
-    recommend_movie = Match.objects.filter(user__in=request.user.followings.values('id')).order_by('-value').first()
+    recommand_movie = Match.objects.order_by('-usercnt').first()
+    
     context = {
-        'recommandmovie':recommandmovie,
+        'recommandmovie':recommand_movie,
     }
     return render(request,"recommand.html",context)
