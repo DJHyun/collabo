@@ -203,8 +203,8 @@ def score_delete(request,match_id,score_id):
 #         return Response({"message":"삭제되었습니다!"})
 
 def recommandmovie(request):
-
-    recommand_movie = Match.objects.order_by('-usercnt').first()
+    today = datetime.datetime.today()-datetime.timedelta(days=1)
+    recommand_movie = Match.objects.filter(date=today).order_by('-usercnt').first()
     
     context = {
         'recommandmovie':recommand_movie,

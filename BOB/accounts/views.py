@@ -156,7 +156,8 @@ def money(request, flag, user_id):
         form = Money.objects.filter(status='승인 대기중')
     else:
         form = MoneyCreationForm()
-    
+        user = get_object_or_404(get_user_model(), pk=user_id)
+        profile = Profile.objects.get(user=user)
     
     context = {
         'form':form,

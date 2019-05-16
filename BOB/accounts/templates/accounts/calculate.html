@@ -25,7 +25,8 @@
       <th scope="col" class="text-center">user</th>
       <th scope="col" class="text-center">영화제목</th>
       <th scope="col" class="text-center">points</th>
-      <th scope="col" class="text-center">up/down</th>
+      <th scope="col" class="text-center">user픽</th>
+      <th scope="col" class="text-center">결과</th>
     </tr>
   </thead>
   <tbody>
@@ -46,8 +47,13 @@
         <td class="text-center">Down</td>
         {% else %}
         <td class="text-center">Up</td>
-        {% endif %}        
-
+        {% endif %}
+        
+        {% if match.match.result == 2%}
+        <td class="text-center">Down</td>
+        {% else %}
+        <td class="text-center">Up</td>
+        {% endif %}
     </tr>
 {% endfor %}
       
