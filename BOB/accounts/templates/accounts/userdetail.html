@@ -1,67 +1,108 @@
 {% extends 'base.html' %}
+
 {% block body %}
-
-
-
-<p>user name : {{user_infos.username}}</p>
-<p>last name : {{user_infos.last_name}}</p>
-<p>first name : {{user_infos.first_name}}</p>
-<p>points : {{user_infos.points }}</p>
-
-
-<table>
-  <tr>
-    <th>참가한 날짜</th>
-    {% if user.is_superuser %}
-    <th>user</th>
-    {% endif %}
-
-    <th>영화제목</th>
-    <th>up/down</th>
-    <th>배당율</th>  
-    <th>points</th>  
-    <th>승패</th>
-  </tr>
-  
-
-  {% for match in matches %}
-  <tr>
-    <td>{{match.match.date}}</td>
-    {% if user.is_superuser %}
-    <td>{{match.user}}</td>
-    {% endif %}
-    <td>{{match.match.movie}}</td>
+<style>
+    table {
+        counter-reset: rowNumber-1;
+    }
     
+    table tr {
+        counter-increment: rowNumber;
+    }
     
-    {% if match.updown == 1 %}
-    <td>Up</td>
-    <td>{{match.match.uprate}}</td>
-    {% else %}
-    <td>Down</td>
-    <td>{{match.match.downrate}}</td>
-    {% endif %}
-    <td>{{match.points}}</td>
-    
-    {% if match.win == 1 %}
-    <td>승</td>
-    {% elif match.win == 2 %}
-    <td>패</td>
-    {% elif match.win == 3 %}
-    <td>무승부</td>
-    {% else %}
-    {% if not user.is_superuser %}
-    <td>
-      <form action = "{% url 'accounts:refund' match.id %}" method = "POST"> 
-      {% csrf_token %}
-      <button type="submit" class="btn btn-info">취소하기</button>
-      </form>
-    </td>
-    {% endif %}
-    {% endif %}
-  </tr>
-  {% endfor %}
+    table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+    }
+</style>
+<h1>마이페이지</h1>
+<hr>
 
-</table>      
+<div class="form-group row">
+  <label for="inputEmail3" class="col-sm-2 col-form-label">ID</label>
+  <div class="col-sm-10">
+    <p class="form-control">{{ user.username }}</p>
+  </div>
+</div>
+<div class="form-group row">
+  <label for="inputEmail3" class="col-sm-2 col-form-label">핸드폰 번호</label>
+  <div class="col-sm-10">
+    <p class="form-control">{{ user_infos.phone_num }}</p>
+  </div>
+</div>
+<p class="text-danger">전용 은행 계좌 등록 후 게임 이용 가능합니다.</p>
+<div class="form-group row">
+  <label for="inputEmail3" class="col-sm-2 col-form-label">전용 은행 계좌</label>
+  <div class="col-sm-10">
+    <p class="form-control">{{ user_infos.bank }}</p>
+  </div>
+</div>
+<div class="form-group row">
+  <label for="inputEmail3" class="col-sm-2 col-form-label">계좌 번호</label>
+  <div class="col-sm-10">
+    <p class="form-control">
+      {% if user_infos.bank_num != None%}
+      {{ user_infos.bank_num }}
+      {% endif %}
+    </p>
+  </div>
+</div>
+<div class="form-group row">
+  <label for="inputEmail3" class="col-sm-2 col-form-label">보유 MoMo</label>
+  <div class="col-sm-10">
+    <p class="form-control">{{ user.points}} MoMo</p>
+  </div>
+</div>
+<div align="right">
+  <div>
+    <a href="{% url 'accounts:user_update' user.id%}"><button class="btn btn-info">정보 수정</button></a>
+  </div>
+</div>
 
+<h1>게임 이력</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">참가한 날짜</th>
+      <th scope="col">영화제목</th>
+      <th scope="col">up/down</th>
+      <th scope="col">배당율</th>
+      <th scope="col">points</th>
+      <th scope="col">승패</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for match in matches %}
+    <tr>
+      <td scope="row"></td>
+      <td>{{match.match.date}}</td>
+      <td>{{match.match.movie}}</td>
+      {% if match.updown == 1 %}
+      <td>Up</td>
+      <td>{{match.match.uprate}}</td>
+      {% else %}
+      <td>Down</td>
+      <td>{{match.match.downrate}}</td>
+      {% endif %}
+      <td>{{match.points}}</td>
+      
+      {% if match.win == 1 %}
+      <td>승</td>
+      {% elif match.win == 2 %}
+      <td>패</td>
+      {% else %}
+      <td>
+        <form action = "{% url 'accounts:refund' match.id %}" method = "POST"> 
+        {% csrf_token %}
+        <button type="submit" class="btn btn-info">취소하기</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

@@ -5,7 +5,12 @@ from django.conf import settings
 # Create your models here.
 class User(AbstractUser):
     points = models.PositiveIntegerField(default=0)
-    bank = models.CharField(blank=False, max_length=120)
+
+class Profile(models.Model):
+    phone_num = models.CharField(max_length=50, blank=True)
+    bank = models.CharField(max_length=20,blank=True)
+    bank_num = models.CharField(max_length=20,blank=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
 class Money(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE)

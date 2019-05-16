@@ -7,9 +7,6 @@ from .forms import ScoreForm
 import os
 from bs4 import BeautifulSoup
 from django.contrib.auth.decorators import login_required
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .serializer import ScoreSerializer
 # Create your views here.
 naver_secret = os.getenv('NAVERSECRET')
 naver_id = os.getenv("NAVERID")
@@ -20,64 +17,63 @@ def test(request):
     
     
 def getmoviedatalocal(request):#데이터수집 영진위에서는 관객정보를 , 네이버에서는 이미지를 긁어옴
+    
     if request.user.is_superuser:
         today1 = datetime.datetime.today()
         # print(today1.strftime("%Y-%m-%d"))
         # print(int(today.strftime("%Y%m%d"))-1)
-        today = int(today1.strftime("%Y%m%d"))-1
-        today2 = today1.strftime("%Y-%m-")
-        yesterday = today2+str(today1.day-1)
-        
-        
-        url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
-        params={
-          'key':'db2280283c7ae6f2389c5ab040847efe',
-          'targetDt':today,#오늘내용 긁어올때
-        #   'targetDt':today-1,#어제내용 긁어올때
-        #   'itemPerPage':'10',
-        }
-        #네이버는 환경변수로 저장함
-        headers = {
-            'X-Naver-Client-Id': naver_id,
-            'X-Naver-Client-Secret': naver_secret
-        }
-        res = requests.get(url,params=params).text
-        doc = json.loads(res)
-        print(res)
-        # print(doc['boxOfficeResult']['dailyBoxOfficeList'][0])
-        # length = len(doc['boxOfficeResult']['dailyBoxOfficeList'])
-        for a in range(10):
-            title = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['movieNm']
-            audiCnt = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiCnt']
-            audinten = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiInten']
-            audiChange = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiChange']
-            auidAcc = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiAcc']
-            naver_url = "https://openapi.naver.com/v1/search/movie?query="+title
-            response = requests.get(naver_url, headers=headers).text
-            document = json.loads(response)['items'][0]
-            userRating = document['userRating']
-            img_url = 'https://movie.naver.com/movie/bi/mi/photoViewPopup.nhn?movieCode='+document['link'].split('=')[1]
-            
-            response2 = requests.get(img_url).text
-            soup = BeautifulSoup(response2,'html.parser')
-            all_divs = soup.find("img")
-            poster_url = all_divs.get('src')
-            
-            movie = Movie()
-            movie.title = title
-            movie.poster_url = poster_url
-            movie.audiCnt = audiCnt
-            movie.audinten = audinten
-            movie.audiChange = audiChange
-            movie.auidAcc = auidAcc
-            movie.userRating = userRating
-            movie.date = today1.strftime("%Y-%m-%d")#오늘내용긁어올때
-            # movie.date = yesterday#어제내용 긁어올때
-            movie.save()
-            
-            # match = Match(movie=movie,standard=movie.audiCnt,date=yesterday)
-            match = Match(movie=movie,standard=movie.audiCnt,date=today1.strftime("%Y-%m-%d"))
-            match.save()
+        for i in range(3,0,-1):
+            today = int(today1.strftime("%Y%m%d"))-i
+            today2 = today1.strftime("%Y-%m-")
+            yesterday = today2+str(today1.day-i+1)
+            # print(today1.strftime("%Y-%m-%d"))
+            # print(int(today.strftime("%Y%m%d"))-1)
+            url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
+            params={
+              'key':'db2280283c7ae6f2389c5ab040847efe',
+              'targetDt':today,
+            #   'itemPerPage':'10',
+            }
+            #네이버는 환경변수로 저장함
+            headers = {
+                'X-Naver-Client-Id': naver_id,
+                'X-Naver-Client-Secret': naver_secret
+            }
+            res = requests.get(url,params=params).text
+            doc = json.loads(res)
+            # print(doc['boxOfficeResult']['dailyBoxOfficeList'][0])
+            # length = len(doc['boxOfficeResult']['dailyBoxOfficeList'])
+            for a in range(10):
+                title = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['movieNm']
+                audiCnt = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiCnt']
+                audinten = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiInten']
+                audiChange = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiChange']
+                auidAcc = doc['boxOfficeResult']['dailyBoxOfficeList'][a]['audiAcc']
+                naver_url = "https://openapi.naver.com/v1/search/movie?query="+title
+                response = requests.get(naver_url, headers=headers).text
+                document = json.loads(response)['items'][0]
+                userRating = document['userRating']
+                img_url = 'https://movie.naver.com/movie/bi/mi/photoViewPopup.nhn?movieCode='+document['link'].split('=')[1]
+                
+                response2 = requests.get(img_url).text
+                soup = BeautifulSoup(response2,'html.parser')
+                all_divs = soup.find("img")
+                poster_url = all_divs.get('src')
+                
+                movie = Movie()
+                movie.title = title
+                movie.poster_url = poster_url
+                movie.audiCnt = audiCnt
+                movie.audinten = audinten
+                movie.audiChange = audiChange
+                movie.auidAcc = auidAcc
+                movie.userRating = userRating
+                # movie.date = today1.strftime("%Y-%m-%d")
+                movie.date = yesterday
+                movie.save()
+                
+                match = Match(movie=movie,standard=movie.audiCnt,date=yesterday)
+                match.save()
     return redirect("movies:list")
 
 def movieList(request):
@@ -103,7 +99,11 @@ def predict(request):
     today1 = datetime.datetime.today()
     matches = Match.objects.filter(date=today1.strftime("%Y-%m-%d"))
     return render(request,'predict.html',{'matches':matches})
-        
+
+# 지난 momo 정보
+def history(request):
+    momos = Match.objects.exclude(date=datetime.datetime.today()).order_by('-date')
+    return render(request,'history.html',{'momos':momos})
         
 # 아래 실행하면 영진위에서 영화 정보 받은 다음에 DB에 저장
 # getmoviedatalocal()
@@ -135,7 +135,6 @@ def score_delete(request,match_id,score_id):
     
     # 참고해보자..
 # https://github.com/anhaeh/forms-vue.js-django/blob/master/app/views.py
-
 
 
 # @api_view(['POST'])

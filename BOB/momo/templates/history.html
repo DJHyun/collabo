@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block body %}
+<style>
+    table {
+        counter-reset: rowNumber-1;
+    }
+    
+    table tr {
+        counter-increment: rowNumber;
+    }
+    
+    table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+    }
+</style>
+<h1>지난 MoMo 정보</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col" class="text-center">No</th>
+      <th scope="col" class="text-center">날짜</th>
+      <th scope="col" class="text-center">영화 이름</th>
+      <th scope="col" class="text-center">up 배당</th>
+      <th scope="col" class="text-center">기준관객수</th>
+      <th scope="col" class="text-center">down 배당</th>
+      <th scope="col" class="text-center">결과</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for momo in momos %}
+    <tr>
+      <td scope="row" class="text-center"></td>
+      <td class="text-center">{{ momo.date }}</td>
+      <td class="text-center">{{ momo.movie.title }}</td>
+      <td class="text-center">{{ momo.uprate }}</td>
+      <td class="text-center">{{ momo.standard }}</td>
+      <td class="text-center">{{ momo.downrate }}</td>
+      {% if momo.result == 1 %}
+      <td class="text-center">UP</td>
+      {% elif momo.result == 2 %}
+      <td class="text-center">DOWN</td>
+      {% else %}
+      <td class="text-center"></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<!--<table class="table">-->
+<!--  <thead>-->
+<!--    <tr>-->
+<!--      <th scope="col">No.</th>-->
+<!--      <th scope="col">영화제목</th>-->
+<!--      <th scope="col">up</th>-->
+<!--      <th scope="col">기준 관객수</th>-->
+<!--      <th scope="col">down</th>-->
+<!--      <th scope="col" class="text-center">구매하기</th>-->
+<!--    </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--    {% for match in matches %}-->
+<!--      <tr>-->
+<!--        <td></td>-->
+<!--        <td>{{match.movie}}</td>-->
+<!--        <td>{{match.uprate}}</td>-->
+<!--        <td>{{match.standard}}</td>-->
+<!--        <td>{{match.downrate}}</td>-->
+<!--        <td>-->
+<!--            <form action = "{% url 'accounts:purchase' match.id %}" method = "POST"> -->
+<!--                {% csrf_token %}-->
+<!--                <input type="radio" name="updown_code" value="1"/>UP-->
+<!--                <input type="radio" name="updown_code" value="2"/>DOWN-->
+<!--                <input type="number" name="points" value="0" max="50000"/>-->
+<!--                <button type="submit" class="btn btn-info">구매하기</button>-->
+<!--            </form>-->
+<!--        </td>-->
+<!--      </tr>-->
+<!--    {% endfor %}-->
+<!--  </tbody>-->
+<!--</table>-->
+
+    
+{% endblock %}

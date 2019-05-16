@@ -34,16 +34,18 @@
       <li class="nav-item">
         <!--<a class="nav-link" href="">내글보기</a>-->
       </li>
+      {% if not user.is_superuser %}
       <li class="nav-item">
         <a class="nav-link" tabindex="-1" aria-disabled="true">{{ user }}님 포인트 {{ user.points }} MoMo</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'accounts:user_update' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
+        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">마이페이지</a>
       </li>
+      {% else %}
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'accounts:user_detail' user.id %}" tabindex="-1" aria-disabled="true">{{user.username}}</a>
+        <a class="nav-link" tabindex="-1" aria-disabled="true">{{ user }}</a>
       </li>
-      
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'accounts:logout' %}">로그아웃</a>
       </li>
